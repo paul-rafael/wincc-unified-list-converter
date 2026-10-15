@@ -4,7 +4,7 @@
 
 **Excel-Exporte aus dem TIA Portal für WinCC Unified aufbereiten – direkt im Browser.**
 
-[![Live-Demo](https://img.shields.io/badge/Live--Demo-online-e10600?style=for-the-badge)](https://paul-rafael.github.io/wincc-unified-list-converter/)
+[![Live-Demo](https://img.shields.io/badge/Live--Demo-online-7a1f2b?style=for-the-badge)](https://paul-rafael.github.io/wincc-unified-list-converter/)
 [![Clientseitig](https://img.shields.io/badge/100%25-clientseitig-0a0a0a?style=for-the-badge)](#datenschutz)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-0a0a0a?style=for-the-badge&logo=typescript&logoColor=white)](src)
 
@@ -110,3 +110,7 @@ Dateien werden ausschließlich lokal im Browser gelesen und erzeugt. Die Seite l
 Die Ergebnisse sollten vor dem Import ins Projekt stichprobenartig geprüft werden. *Meldetexte umbrechen* befindet sich noch in der Beta-Phase.
 
 WinCC und TIA Portal sind Marken ihrer jeweiligen Inhaber. Dieses Projekt ist ein unabhängiges Werkzeug und steht in keiner Verbindung zu den Markeninhabern.
+
+---
+
+<sub>Entwickelt von **Paul-Rafael Hasan-Man**</sub>
