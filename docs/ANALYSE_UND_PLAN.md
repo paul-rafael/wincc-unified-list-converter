@@ -1,10 +1,10 @@
 # WinCC Unified List Converter – Analysebericht & Implementierungsplan
 
-Stand: 15.10.2026 · Phase A (Analyse) und Phase B (Entwurf) · **noch keine Implementierung**
+Stand: 15.10.2026 · Phase A (Analyse) und Phase B (Entwurf). Umgesetzt: alle 5 Funktionen, siehe [ABWEICHUNGEN.md](ABWEICHUNGEN.md).
 
 Quellen (unverändert, nur Kopien analysiert):
-- `~/Downloads/Unified_Migration_Tool.xlsm` – VBA-Projekt mit 11 Modulen, 2 UserForms, 1 Arbeitsblatt
-- `~/Downloads/WinCC_Unified_Panels_Migration.docx` – Migrationsanleitung (Stand 05.05.2025, Autor HAPL), beschreibt die Tools in Kap. „Migrations-Hilfetool“
+- `Unified_Migration_Tool.xlsm` – VBA-Projekt mit 11 Modulen, 2 UserForms, 1 Arbeitsblatt
+- `WinCC_Unified_Panels_Migration.docx` – Migrationsanleitung, beschreibt die Funktionen im Kapitel „Migrations-Hilfetool“
 
 ---
 
@@ -14,7 +14,7 @@ Quellen (unverändert, nur Kopien analysiert):
 
 | Element | Befund |
 |---|---|
-| Blätter | nur `Tabelle1` (UI-Blatt, geschützt, Titel „WinCC Unified Panel Migration Hilfstool by HAPL“, Hinweistext, Logo) |
+| Blätter | nur `Tabelle1` (UI-Blatt, geschützt, Titel, Hinweistext, Logo) |
 | Daten im Tool selbst | keine – alle Makros öffnen eine **externe** Datei |
 | Schaltflächen | 5 Formular-Buttons (siehe 1.2) |
 | UserForm1, UserForm2 | leer (kein Code, keine Verwendung) |
@@ -203,7 +203,9 @@ scripts/compare-xlsx.ts   Vergleich: Blätter, Reihenfolge, Zellwerte, Typen, Fo
 
 ---
 
-## 6. Offene Entscheidungen (benötige ich von dir)
+## 6. Entscheidungen
 
-1. **Umfang:** Nur die 4 per Button erreichbaren Konverter portieren (Empfehlung)? Der Button „BETA AZU“ ruft aktuell den TagList-Konverter auf – vermutlich ein Verknüpfungsfehler; die eigentliche AZU-Logik (Modul7) ist ungetestet und speichert nicht. Soll AZU weggelassen oder als „Beta“ nach Modul7 umgesetzt werden?
-2. **Referenzdateien:** Bitte je Konverter mindestens eine echte Eingabedatei und die vom Original-Tool (Windows, deutsches Excel) erzeugte Ausgabe bereitstellen – ideal mit Randfällen (Umlaute, Zahlen als Namen, leere Zellen, mehrere Feldreferenzen).
+1. **Umfang:** Alle 5 Funktionen des Excel-Tools werden portiert. Der Button „BETA AZU“ war im Original mit dem TagList-Makro verknüpft; die Webversion verwendet die eigentliche AZU-Logik aus Modul7 (`FormatHMITextWithErrorCode`) und kennzeichnet sie als Beta.
+2. **Namen:** Die Funktionen heißen in der Webversion *HMI-Variablen*, *Textlisten · Klassisch*, *Textlisten · Aktuell*, *HMI-Meldungen* und *Meldetexte umbrechen*.
+3. **`.xls`:** wird mit Hinweis abgelehnt.
+4. **Referenzdateien:** stehen noch aus (siehe ABWEICHUNGEN.md).

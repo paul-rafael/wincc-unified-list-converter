@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>WinCC Unified List Converter</title>
     <meta name="description" content="Excel-Exporte aus dem TIA Portal (HMI-Variablen, Textlisten, HMI-Meldungen) für WinCC Unified aufbereiten – direkt im Browser, ohne Upload." />
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230f766e'/%3E%3Cpath d='M9 11h14M9 16h9M9 21h14' stroke='white' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23e10600'/%3E%3Cpath d='M9 11h14M9 16h9M9 21h14' stroke='white' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E" />
     <link rel="stylesheet" href="./src/styles.css" />
   </head>
   <body>
@@ -29,13 +29,15 @@
     </header>
 
     <main id="top">
-      <section class="hero wrap">
-        <p class="eyebrow">TIA Portal → WinCC Unified</p>
-        <h1>Excel-Listen für WinCC Unified aufbereiten</h1>
-        <p class="lead">
-          Konvertiert exportierte HMI-Variablen, Textlisten und HMI-Meldungen in ein Format, das WinCC Unified akzeptiert –
-          nach exakt denselben Regeln wie das bewährte Excel-Migrationstool. Datei auswählen, konvertieren, herunterladen.
-        </p>
+      <section class="hero-band">
+        <div class="hero wrap">
+          <p class="eyebrow">TIA Portal → WinCC Unified</p>
+          <h1>Excel-Listen für <em>WinCC Unified</em> aufbereiten</h1>
+          <p class="lead">
+            Konvertiert exportierte HMI-Variablen, Textlisten und HMI-Meldungen in ein Format, das WinCC Unified akzeptiert.
+            Datei auswählen, konvertieren, herunterladen – kostenlos, ohne Anmeldung und ohne Upload.
+          </p>
+        </div>
       </section>
 
       <section id="converter" class="wrap">
@@ -127,7 +129,7 @@
         <div class="section-head">
           <p class="eyebrow">Anleitung</p>
           <h2>So funktioniert der Converter</h2>
-          <p>Jeder Konverter erwartet eine Exportdatei aus dem TIA Portal und liefert eine Datei zurück, die du wieder importierst bzw. einfügst.</p>
+          <p>Jede Funktion erwartet eine Exportdatei aus dem TIA Portal und liefert eine Datei zurück, die du wieder importierst bzw. einfügst.</p>
         </div>
 
         <ol class="flow">
@@ -179,11 +181,11 @@
           <div class="guide-grid">
             <div>
               <h3>Wofür?</h3>
-              <p>Für Textlisten aus <strong>CICON oder älteren Commander HMIs</strong>. Ungültige Objekte werden entfernt, leere Sprachvarianten werden befüllt. Der deutsche Text bleibt unberührt.</p>
+              <p>Für Textlisten <strong>älterer Panel-Projekte</strong>, deren Export Platzhalter wie <code>&lt;No value&gt;</code> oder <code>&lt;field ref="0" /&gt;</code> enthält. Ungültige Objekte werden entfernt, leere Sprachvarianten werden befüllt. Der Text der Hauptsprache (Spalte E) bleibt unberührt.</p>
               <h3>So gehst du vor</h3>
               <ol class="steps">
                 <li>Die Textlisten im alten Projekt exportieren.</li>
-                <li>Oben <em>Textlisten · Legacy</em> wählen, Datei hochladen und konvertieren.</li>
+                <li>Oben <em>Textlisten · Klassisch</em> wählen, Datei hochladen und konvertieren.</li>
                 <li>Mit der Ergebnisdatei wie bei den HMI-Variablen verfahren: sortieren und die bereinigten Einträge übernehmen.</li>
               </ol>
             </div>
@@ -205,11 +207,11 @@
           <div class="guide-grid">
             <div>
               <h3>Wofür?</h3>
-              <p>Für Textlisten aus <strong>neueren Commander HMIs</strong>. Die Namen der Textlisten und Einträge werden in eine von Unified akzeptierte Schreibweise gebracht.</p>
+              <p>Für Textlisten <strong>neuerer Panel-Projekte</strong>, deren Texte bereits sauber sind. Die Namen der Textlisten und Einträge werden in eine von Unified akzeptierte Schreibweise gebracht.</p>
               <h3>So gehst du vor</h3>
               <ol class="steps">
                 <li>Die Textlisten im alten Projekt exportieren.</li>
-                <li>Oben <em>Textlisten · Standard</em> wählen, Datei hochladen und konvertieren.</li>
+                <li>Oben <em>Textlisten · Aktuell</em> wählen, Datei hochladen und konvertieren.</li>
                 <li>Die Ergebnisdatei wieder importieren bzw. die Namen wie bei den HMI-Variablen übernehmen.</li>
               </ol>
             </div>
@@ -251,6 +253,32 @@
           </div>
         </article>
 
+        <article class="guide-panel" data-guide="lineBreaks" hidden>
+          <div class="guide-grid">
+            <div>
+              <h3>Wofür?</h3>
+              <p>Unified Panels brechen lange Melde- und Alarmtexte nicht mehr automatisch um. Der Umbruch muss deshalb direkt im Meldetext hinterlegt werden – diese Funktion erledigt das für die ganze Liste.</p>
+              <p class="beta-note"><strong>Beta:</strong> Die Funktion ist noch in der Testphase. Ergebnisse bitte prüfen, ggf. ist eine manuelle Nachbearbeitung nötig.</p>
+              <h3>So gehst du vor</h3>
+              <ol class="steps">
+                <li>Die HMI-Meldungen exportieren (oder die Datei aus <em>HMI-Meldungen</em> verwenden).</li>
+                <li>Oben <em>Meldetexte umbrechen</em> wählen, Datei hochladen und konvertieren.</li>
+                <li>Die Datei importieren und die Darstellung der Meldungen am Panel prüfen.</li>
+              </ol>
+            </div>
+            <aside class="rules">
+              <h4>Was genau geändert wird</h4>
+              <ul>
+                <li>Erstes Tabellenblatt, Spalte C (Meldetext), ab Zeile 2.</li>
+                <li>Der Text bis zum ersten <code>_</code> wird als Fehlercode in die erste Zeile gestellt.</li>
+                <li>Der restliche Text wird auf Zeilen mit max. 80 Zeichen verteilt, vor <code>Position:</code>, <code>Geschw.:</code>, <code>X:</code>, <code>Y:</code>, <code>Z:</code> wird immer umgebrochen.</li>
+                <li>Zeilen werden mit <code>¶</code> getrennt (höchstens drei Zeilen), Zellen erhalten „Zeilenumbruch“, die Zeilenhöhe passt sich an.</li>
+                <li>Eingabe: <code>.xlsx</code>, <code>.xlsm</code> · Ergebnis: gleicher Dateiname</li>
+              </ul>
+            </aside>
+          </div>
+        </article>
+
         <div class="cards">
           <div class="card">
             <h3>Vor dem Start von Data2Unified</h3>
@@ -274,8 +302,8 @@
 
     <footer class="footer">
       <div class="wrap footer-inner">
-        <span>WinCC Unified List Converter · Webversion des Unified Migration Tools (v2) von HAPL</span>
-        <span>Ergebnisse vor dem Import prüfen.</span>
+        <span><strong>WinCC Unified List Converter</strong> · Frei nutzbar, ohne Anmeldung · Verarbeitung lokal im Browser</span>
+        <span>Ergebnisse vor dem Import prüfen. <a href="https://github.com/paul-rafael/wincc-unified-list-converter">Quellcode auf GitHub</a></span>
       </div>
     </footer>
 

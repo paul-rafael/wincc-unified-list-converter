@@ -282,3 +282,42 @@ describe('HMI-Meldungen (ConvertAlarmList_Unified)', () => {
     expect(sst).toContain('_x000D_\n');
   });
 });
+
+describe('Meldetexte umbrechen (FormatHMITextWithErrorCode)', () => {
+  it('splits error code and wraps at 80 characters', async () => {
+    const { formatHmiText } = await import('../../src/converters/lineBreaks');
+    expect(formatHmiText('E101_Motor laeuft nicht')).toBe('E101¶Motor laeuft nicht');
+    expect(formatHmiText('MFS_CON_12_Text')).toBe('MFS-CON¶12_Text');
+    expect(formatHmiText('OhneUnterstrich')).toBe('OhneUnterstrich');
+    expect(formatHmiText('')).toBe('');
+    expect(formatHmiText('  E1_a  ')).toBe('E1¶a');
+    expect(formatHmiText('E2_Achse steht Position: 100 Geschw.: 5')).toBe('E2¶Achse steht¶Position: 100 Geschw.: 5');
+    const long = 'E3_' + Array.from({ length: 30 }, (_, i) => `Wort${i}`).join(' ');
+    const [code, l2, l3] = formatHmiText(long).split('¶');
+    expect(code).toBe('E3');
+    expect(l2.length).toBeLessThanOrEqual(80);
+    expect(l3.startsWith('Wort')).toBe(true);
+    // first word is a keyword: line 2 stays empty and the next break fills it
+    expect(formatHmiText('E4_X: 1 Y: 2')).toBe('E4¶X: 1¶Y: 2');
+  });
+
+  it('writes column C with wrap text and auto row height', async () => {
+    const { convertLineBreaks } = await import('../../src/converters/lineBreaks');
+    const input = await makeXlsx([
+      { name: 'DiscreteAlarms', rows: { 1: { A: 'ID', C: 'Text' }, 2: { A: 1, C: 'E1_Motor heiss' }, 3: { A: 2, C: { s: 3, v: 'E2_Druck' } } } },
+    ]);
+    const res = await convertLineBreaks(input, 'Alarms.xlsx');
+    expect(res.fileName).toBe('Alarms.xlsx');
+    const get = await readSheet(res.data);
+    expect(get(1, 'C')).toEqual(str('Text'));
+    expect(get(2, 'C')).toEqual(str('E1¶Motor heiss'));
+    expect(get(3, 'C')).toEqual(str('E2¶Druck'));
+    const zip = await JSZip.loadAsync(res.data);
+    const styles = await zip.file('xl/styles.xml')!.async('string');
+    expect(styles).toContain('<cellXfs count="6">');
+    expect((styles.match(/wrapText="1"/g) ?? []).length).toBe(2); // General + bold, each cloned once
+    const sheet = await zip.file('xl/worksheets/sheet1.xml')!.async('string');
+    expect(sheet).toMatch(/<c r="C2"(?=[^>]*s="4")[^>]*>/);
+    expect(sheet).toMatch(/<c r="C3"(?=[^>]*s="5")[^>]*>/);
+  });
+});
