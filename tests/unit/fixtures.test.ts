@@ -49,4 +49,12 @@ describe('fixtures written by openpyxl', () => {
     expect(get(3, 'AG')).toEqual(str('Druck_Soll'));
     expect(get(4, 'D')).toEqual({ kind: 'empty' });
   });
+
+  it('Meldetexte umbrechen', async () => {
+    const res = await run('lineBreaks', 'HMIAlarms.xlsx');
+    expect(res.fileName).toBe('HMIAlarms.xlsx');
+    const get = await readSheet(res.data, 'DiscreteAlarms');
+    expect(get(2, 'C')).toEqual(str('MFS-CON¶Motor 1 Übertemperatur <field ref="1" /> °C'));
+    expect(get(4, 'C')).toEqual(str('Tür offen'));
+  });
 });

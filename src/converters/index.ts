@@ -1,4 +1,5 @@
 import { convertAlarms } from './alarms';
+import { convertLineBreaks } from './lineBreaks';
 import type { ConversionResult, ConverterId } from './common';
 import { convertTags } from './tags';
 import { convertTextlistLegacy } from './textlistLegacy';
@@ -13,6 +14,7 @@ export interface ConverterDef {
   /** Name of the button in the original Excel tool. */
   legacyName: string;
   accept: string[];
+  beta?: boolean;
   run: (data: ArrayBuffer, fileName: string) => Promise<ConversionResult>;
 }
 
@@ -27,16 +29,16 @@ export const CONVERTERS: ConverterDef[] = [
   },
   {
     id: 'textlistLegacy',
-    title: 'Textlisten · Legacy',
-    subtitle: 'CICON und ältere Commander HMIs',
+    title: 'Textlisten · Klassisch',
+    subtitle: 'Platzhalter bereinigen, leere Sprachen füllen',
     legacyName: 'HMI TextList Konverter (alt)',
     accept: ['.xlsx', '.xlsm'],
     run: convertTextlistLegacy,
   },
   {
     id: 'textlistStandard',
-    title: 'Textlisten · Standard',
-    subtitle: 'Neuere Commander HMIs',
+    title: 'Textlisten · Aktuell',
+    subtitle: 'Sonderzeichen in Textlisten-Namen ersetzen',
     legacyName: 'HMI TextList Konverter (neu)',
     accept: ['.xlsx', '.xlsm'],
     run: convertTextlistStandard,
@@ -48,5 +50,14 @@ export const CONVERTERS: ConverterDef[] = [
     legacyName: 'HMI-Alarm Konverter',
     accept: ['.xlsx', '.xlsm'],
     run: convertAlarms,
+  },
+  {
+    id: 'lineBreaks',
+    title: 'Meldetexte umbrechen',
+    subtitle: 'Automatischer Zeilenumbruch für lange Meldungen',
+    legacyName: 'BETA AZU',
+    accept: ['.xlsx', '.xlsm'],
+    beta: true,
+    run: convertLineBreaks,
   },
 ];

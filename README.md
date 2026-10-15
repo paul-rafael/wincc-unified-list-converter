@@ -1,54 +1,112 @@
+<div align="center">
+
 # WinCC Unified List Converter
 
-Webversion des Excel-basierten *Unified Migration Tool (v2)*. Die App bereitet Excel-Exporte aus dem TIA Portal für WinCC Unified auf und verwendet dabei exakt die Regeln der getesteten VBA-Makros. Die Verarbeitung läuft vollständig im Browser: Es gibt keinen Server, kein Konto und keine Übertragung der Dateien.
+**Excel-Exporte aus dem TIA Portal für WinCC Unified aufbereiten – direkt im Browser.**
 
-| Konverter | Ehemals (Excel-Button) | Eingabe | Ergebnis |
-|---|---|---|---|
-| HMI-Variablen | HMI TagList Konverter | `.xlsx` | `HMITagList_MIGUNI.xlsx` |
-| Textlisten · Legacy | HMI TextList Konverter (alt) | `.xlsx`, `.xlsm` | `<Name>_MIGUNI.xlsx` |
-| Textlisten · Standard | HMI TextList Konverter (neu) | `.xlsx`, `.xlsm` | `<Name>.xlsx` |
-| HMI-Meldungen | HMI-Alarm Konverter | `.xlsx`, `.xlsm` | `Unified_HMI-Alarms.xlsx` |
+[![Live-Demo](https://img.shields.io/badge/Live--Demo-online-e10600?style=for-the-badge)](https://paul-rafael.github.io/wincc-unified-list-converter/)
+[![Clientseitig](https://img.shields.io/badge/100%25-clientseitig-0a0a0a?style=for-the-badge)](#datenschutz)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-0a0a0a?style=for-the-badge&logo=typescript&logoColor=white)](src)
 
-Dokumentation:
-- [docs/ANALYSE_UND_PLAN.md](docs/ANALYSE_UND_PLAN.md) – Analyse der VBA-Makros und alle Umwandlungsregeln
-- [docs/ABWEICHUNGEN.md](docs/ABWEICHUNGEN.md) – bekannte Unterschiede zum Original und Teststand
+[**Converter öffnen →**](https://paul-rafael.github.io/wincc-unified-list-converter/)
 
-## Lokal starten
+<img src="docs/assets/screenshot.jpg" alt="Oberfläche des WinCC Unified List Converters" width="820" />
 
-Voraussetzung: Node.js 20 oder neuer.
+</div>
+
+---
+
+Bei der Migration eines WinCC-Projekts auf Unified Panels müssen HMI-Variablen, Textlisten und HMI-Meldungen angepasst werden: Unified akzeptiert keine Sonderzeichen in Namen, verwendet eine andere FieldInfo-Struktur für Meldungen und bricht lange Meldetexte nicht mehr automatisch um. Der **WinCC Unified List Converter** erledigt diese Arbeit in Sekunden. Datei hineinziehen, konvertieren, herunterladen – ohne Installation, ohne Anmeldung und ohne dass die Datei den Rechner verlässt.
+
+## Funktionen
+
+| | Funktion | Was sie macht | Eingabe | Ergebnis |
+|---|---|---|---|---|
+| 1 | **HMI-Variablen** | Ersetzt alle Sonderzeichen in Variablennamen durch `_` | `.xlsx` | `HMITagList_MIGUNI.xlsx` |
+| 2 | **Textlisten · Klassisch** | Bereinigt Platzhalter (`<No value>`, `<field ref="0" />`) und Tags, füllt leere Sprachvarianten | `.xlsx` `.xlsm` | `<Name>_MIGUNI.xlsx` |
+| 3 | **Textlisten · Aktuell** | Ersetzt `# / .` und `[ ]` in den Namen von Textlisten und Einträgen | `.xlsx` `.xlsm` | `<Name>.xlsx` |
+| 4 | **HMI-Meldungen** | Erzeugt die Unified-Alarmliste `DiscreteAlarms` (44 Spalten) inkl. neuer FieldInfo | `.xlsx` `.xlsm` | `Unified_HMI-Alarms.xlsx` |
+| 5 | **Meldetexte umbrechen** <sup>Beta</sup> | Teilt Meldetexte in Fehlercode und Zeilen à max. 80 Zeichen (`¶`) | `.xlsx` `.xlsm` | gleicher Dateiname |
+
+Eine ausführliche Anleitung zu jeder Funktion ist direkt in die Anwendung integriert.
+
+## Highlights
+
+- **Datenschutz durch Architektur** – Die gesamte Verarbeitung läuft im Browser. Es gibt keinen Server, kein Tracking, keine Cookies und keinen Upload.
+- **Formattreu** – Nur die betroffenen Zellen werden geändert. Formatierungen, Spaltenbreiten, weitere Blätter und alle übrigen Inhalte der Arbeitsmappe bleiben unverändert.
+- **Regelgetreu** – Die Konvertierungslogik ist eine 1:1-Portierung eines in der Praxis erprobten Excel-/VBA-Werkzeugs, einschließlich seiner Sonderfälle.
+- **Nachvollziehbar** – Werte, die Excel möglicherweise anders interpretieren würde (Zahlen, Datumswerte, Formeln), werden mit Zellangabe als Hinweis ausgegeben, statt sie still zu verändern.
+- **Getestet** – Automatisierte Tests für jede Regel; die Ergebnisdateien werden in Microsoft Excel ohne Reparaturmeldung geöffnet.
+- **Responsiv** – funktioniert auf Desktop, Tablet und Smartphone, im hellen und dunklen Modus.
+
+## Nutzung
+
+1. [Converter öffnen](https://paul-rafael.github.io/wincc-unified-list-converter/)
+2. Funktion wählen und die Exportdatei aus dem TIA Portal hineinziehen
+3. **Konvertieren** klicken und das Ergebnis herunterladen
+4. Hinweise prüfen und die Datei wieder ins Projekt übernehmen
+
+## Entwicklung
+
+Voraussetzung: [Node.js](https://nodejs.org/) 20 oder neuer.
 
 ```bash
+git clone https://github.com/paul-rafael/wincc-unified-list-converter.git
+cd wincc-unified-list-converter
 npm install
 npm run dev        # Entwicklungsserver auf http://localhost:5173
-npm test           # automatisierte Tests
-npm run build      # statischer Build nach dist/
-npm run preview    # Build lokal ansehen
 ```
 
-## Aufbau
+| Befehl | Beschreibung |
+|---|---|
+| `npm run dev` | Entwicklungsserver mit Live-Reload |
+| `npm test` | Unit- und Dateitests (Vitest) |
+| `npm run build` | Typprüfung und statischer Build nach `dist/` |
+| `npm run preview` | Build lokal ansehen |
+| `npm run deploy` | Build auf GitHub Pages veröffentlichen (Branch `gh-pages`) |
+
+### Projektstruktur
 
 ```
-src/xlsx/        XLSX lesen und Zellen direkt im XML ändern (Formatierung bleibt erhalten), neue Mappe schreiben
-src/vba/         Nachbildung der VBA/Excel-Funktionen (Trim, Like, CStr, Text-Interpretation …)
-src/converters/  die vier Konverter (je eine Datei, Kommentar nennt das VBA-Original)
-src/main.ts      Oberfläche
-tests/           Unit-Tests und Beispieldateien
+src/
+├── converters/   Die fünf Funktionen – je eine Datei, mit Verweis auf die Originalregel
+├── vba/          Nachbildung von VBA-/Excel-Verhalten (Trim, Like, CStr, Texterkennung)
+├── xlsx/         XLSX lesen, Zellen formattreu ändern, neue Arbeitsmappen schreiben
+├── main.ts       Oberfläche
+└── styles.css
+tests/
+├── unit/         Tests für alle Regeln und Sonderfälle
+└── fixtures/     Beispiel-Exportdateien
+docs/             Analyse, Regelwerk und bekannte Abweichungen
 ```
 
-Abhängigkeiten zur Laufzeit: nur [JSZip](https://stuk.github.io/jszip/). Die Bibliotheken SheetJS (Community Edition) und ExcelJS kamen nicht infrage, weil sie beim Speichern Formatierungen bzw. Teile der Datei verwerfen. Die Original-Makros verändern dagegen nur Zellwerte.
+### Technik
 
-## Veröffentlichung über GitHub Pages
+- **TypeScript** (strict) und **Vite** – statischer Build ohne Backend
+- **JSZip** als einzige Laufzeitabhängigkeit; die Excel-Dateien werden direkt auf XML-Ebene bearbeitet. Gängige Tabellenbibliotheken verwerfen beim Speichern Formatierungen oder Dateibestandteile.
+- **Vitest** für automatisierte Tests
 
-Die App ist eine statische Seite mit relativen Pfaden (`base: './'`). Sie funktioniert deshalb auch unter `https://<user>.github.io/<repo>/`.
+## Veröffentlichung
+
+Die Anwendung verwendet relative Pfade und läuft deshalb unter jeder GitHub-Pages-Adresse.
 
 ```bash
-npm run deploy     # baut die App und pusht dist/ in den Branch gh-pages
+npm run deploy
 ```
 
-Einmalig in GitHub unter **Settings → Pages**: *Source: Deploy from a branch*, Branch `gh-pages`, Ordner `/ (root)` auswählen.
+Einmalig unter **Settings → Pages** als Quelle *Deploy from a branch* → `gh-pages` / `(root)` wählen.
 
-Für eine Veröffentlichung per GitHub Actions wird ein Token mit `workflow`-Berechtigung benötigt (`gh auth refresh -s workflow`).
+## Dokumentation
 
-## Vergleich mit dem Original
+- [Analyse & Regelwerk](docs/ANALYSE_UND_PLAN.md) – alle Umwandlungsregeln im Detail
+- [Abweichungen & Teststand](docs/ABWEICHUNGEN.md) – bekannte Unterschiede zum Excel-Original
 
-Damit sich die Webversion gegen das Original prüfen lässt, lege Paare aus Eingabedatei und Ausgabe des Excel-Tools in `tests/fixtures/` ab und ergänze sie in `tests/unit/fixtures.test.ts`. Wird `OUT_DIR=<ordner> npm test` gesetzt, speichern die Tests die erzeugten Dateien zum manuellen Vergleich.
+## Datenschutz
+
+Dateien werden ausschließlich lokal im Browser gelesen und erzeugt. Die Seite lädt keine externen Skripte, Schriften oder Tracker.
+
+## Hinweis
+
+Die Ergebnisse sollten vor dem Import ins Projekt stichprobenartig geprüft werden. *Meldetexte umbrechen* befindet sich noch in der Beta-Phase.
+
+WinCC und TIA Portal sind Marken ihrer jeweiligen Inhaber. Dieses Projekt ist ein unabhängiges Werkzeug und steht in keiner Verbindung zu den Markeninhabern.

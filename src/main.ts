@@ -6,6 +6,7 @@ const ICONS: Record<string, string> = {
   textlistLegacy: '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h5"/><path d="M8 17h2"/>',
   textlistStandard: '<path d="M8 6h12M8 12h12M8 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/>',
   alarms: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+  lineBreaks: '<path d="M4 6h16M4 12h13a3 3 0 0 1 0 6h-4"/><path d="m15 16-2 2 2 2"/><path d="M4 18h5"/>',
 };
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -42,7 +43,7 @@ function renderTypes(): void {
       <span class="type-body">
         <span class="type-title">${c.title}</span>
         <span class="type-sub">${c.subtitle}</span>
-        <span class="type-meta">${c.accept.map((a) => `<span class="chip">${a}</span>`).join('')}</span>
+        <span class="type-meta">${c.beta ? '<span class="chip chip-beta">BETA</span>' : ''}${c.accept.map((a) => `<span class="chip">${a}</span>`).join('')}</span>
       </span>
       <span class="type-check">${svg('<path d="M20 6 9 17l-5-5"/>')}</span>`;
     label.title = `Entspricht „${c.legacyName}“ im Excel-Tool`;
@@ -168,7 +169,10 @@ async function convert(): Promise<void> {
 }
 
 function showResult(r: ConversionResult): void {
-  const blob = new Blob([r.data as BlobPart], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const type = r.fileName.toLowerCase().endsWith('.xlsm')
+    ? 'application/vnd.ms-excel.sheet.macroEnabled.12'
+    : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+  const blob = new Blob([r.data as BlobPart], { type });
   downloadUrl = URL.createObjectURL(blob);
   downloadEl.href = downloadUrl;
   downloadEl.download = r.fileName;

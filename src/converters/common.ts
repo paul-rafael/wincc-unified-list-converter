@@ -16,7 +16,7 @@ export interface ConversionResult {
   summary: string;
 }
 
-export type ConverterId = 'tags' | 'textlistLegacy' | 'textlistStandard' | 'alarms';
+export type ConverterId = 'tags' | 'textlistLegacy' | 'textlistStandard' | 'alarms' | 'lineBreaks';
 
 export class NoticeLog {
   readonly items: Notice[] = [];

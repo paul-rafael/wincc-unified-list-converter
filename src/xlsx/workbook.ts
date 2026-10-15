@@ -73,6 +73,9 @@ export class Workbook {
   private sstPath: string | null = null;
   private sstDirty = false;
   private xfs: XfInfo[] = [];
+  private stylesDoc: Document | null = null;
+  private stylesPath: string | null = null;
+  private wrapStyleCache = new Map<number, number>();
   private openSheets = new Map<string, Sheet>();
   private dirtyDocs = new Map<string, Document>();
   formulasRemoved = false;
@@ -157,6 +160,8 @@ export class Workbook {
     const stylesPath = this.relTargetByType(REL_STYLES);
     if (stylesPath && this.zip.file(stylesPath)) {
       const st = parseXml(await this.text(stylesPath), stylesPath);
+      this.stylesDoc = st;
+      this.stylesPath = stylesPath;
       const custom = new Map<number, string>();
       for (const nf of Array.from(st.getElementsByTagNameNS(NS_MAIN, 'numFmt'))) {
         custom.set(Number(nf.getAttribute('numFmtId')), nf.getAttribute('formatCode') ?? '');
@@ -242,6 +247,43 @@ export class Workbook {
       .replace(/\[[^\]]*\]/g, '')
       .replace(/General/gi, '');
     return /[dmyhs]/i.test(cleaned);
+  }
+
+  /**
+   * Index of a cell format equal to `styleIndex` but with "Zeilenumbruch" (wrapText) switched on,
+   * which is what `Range.WrapText = True` does. A new <xf> is appended when needed.
+   */
+  wrapStyle(styleIndex: number | null): number {
+    const base = styleIndex ?? 0;
+    const cached = this.wrapStyleCache.get(base);
+    if (cached !== undefined) return cached;
+    if (!this.stylesDoc || !this.stylesPath) {
+      throw new ConversionError('Die Arbeitsmappe enthält keine Formatvorlagen (styles.xml); der Zeilenumbruch kann nicht gesetzt werden.');
+    }
+    const cellXfs = this.stylesDoc.getElementsByTagNameNS(NS_MAIN, 'cellXfs')[0];
+    const xfList = cellXfs ? childElements(cellXfs, 'xf') : [];
+    const xf = xfList[base];
+    if (!xf) throw new ConversionError(`Die Arbeitsmappe ist beschädigt (Zellformat ${base} fehlt).`);
+    const align = firstChild(xf, 'alignment');
+    if (align && (align.getAttribute('wrapText') === '1' || align.getAttribute('wrapText') === 'true')) {
+      this.wrapStyleCache.set(base, base);
+      return base;
+    }
+    const clone = xf.cloneNode(true) as Element;
+    clone.setAttribute('applyAlignment', '1');
+    let a = firstChild(clone, 'alignment');
+    if (!a) {
+      a = createLike(this.stylesDoc, clone, 'alignment');
+      clone.insertBefore(a, clone.firstChild);
+    }
+    a.setAttribute('wrapText', '1');
+    cellXfs.appendChild(clone);
+    const idx = xfList.length;
+    cellXfs.setAttribute('count', String(idx + 1));
+    this.xfs.push({ ...this.xf(base) });
+    this.wrapStyleCache.set(base, idx);
+    this.dirtyDocs.set(this.stylesPath, this.stylesDoc);
+    return idx;
   }
 
   sheetIndexByName(name: string): number {
@@ -571,6 +613,29 @@ export class Sheet {
     map.set(col, c);
     this.touchedRows.add(row);
     return c;
+  }
+
+  /** Range.WrapText = True for one cell (creates the cell if it does not exist yet). */
+  setWrapText(row: number, col: number): void {
+    let c = this.cellEl(row, col);
+    if (!c) c = this.createCell(row, col);
+    const s = c.getAttribute('s');
+    const idx = this.wb.wrapStyle(s !== null ? Number(s) : null);
+    if (idx === 0) c.removeAttribute('s');
+    else c.setAttribute('s', String(idx));
+    this.dirty = true;
+  }
+
+  /**
+   * Rows(i).AutoFit: the height is computed by Excel from the content, so the stored height is
+   * removed and Excel sizes the row automatically when the file is opened.
+   */
+  autoFitRow(row: number): void {
+    const r = this.rows.get(row);
+    if (!r) return;
+    r.removeAttribute('ht');
+    r.removeAttribute('customHeight');
+    this.dirty = true;
   }
 
   /** Writes the sheet back: refreshes <dimension> and row spans of rows that got new cells. */
