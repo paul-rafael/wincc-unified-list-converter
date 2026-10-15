@@ -30,13 +30,13 @@ Quellen (unverändert, nur Kopien analysiert):
 | HMI TextList Konverter (alt) | `Clean_TextList_File_SelectAndSave` → `Clean_TextList_Sheet` | Modul2 |
 | HMI TextList Konverter (neu) | `Button_DateiAuswaehlen_Bearbeiten_Speichern` → `ReplaceSpecialCharsInWorkbook` → `ReplaceInSheetColumn` | Modul3 |
 | HMI-Alarm Konverter | `ConvertAlarmList_Unified` → `ExtractRefs`, `ExtractTagByRef`, `ExtractLengthByRef` | Modul8 |
-| BETA AZU | **`SonderzeichenMitKnopf`** (identisch mit TagList-Konverter!) | Modul1 |
+| AZU | **`SonderzeichenMitKnopf`** (identisch mit TagList-Konverter!) | Modul1 |
 
 ### 1.3 Makros ohne Button (nicht über die Oberfläche erreichbar)
 
 | Makro | Modul | Zustand |
 |---|---|---|
-| `FormatHMITextInFile` / `FormatHMITextWithErrorCode` | Modul7 | inhaltlich die in der Doku beschriebene **BETA-AZU**-Funktion (Zeilenumbruch mit `¶`). Kein Button verknüpft, **speichert die Datei nicht** (lässt sie geöffnet). |
+| `FormatHMITextInFile` / `FormatHMITextWithErrorCode` | Modul7 | inhaltlich die in der Doku beschriebene **AZU**-Funktion (Zeilenumbruch mit `¶`). Kein Button verknüpft, **speichert die Datei nicht** (lässt sie geöffnet). |
 | `ConvertAlarmLists2` + `ConvertAllRefs` + `ExtractRefID/Tag/DisplayType/Length` | Modul9/10/11 | Alternative Alarm-Konvertierung mit zwei Eingabedateien (alt + bereits migrierte Unified-Liste). Kein Button. |
 | `Excel_Bereinigen` | Modul4 (+ `GetValueBetween` Modul5) | ersetzt `<field ref="n" />` durch `<Variable : Länge. Tag>`; zeigt am Ende nur einen Speichern-Dialog, **speichert aber nicht**. Kein Button. |
 
@@ -205,7 +205,7 @@ scripts/compare-xlsx.ts   Vergleich: Blätter, Reihenfolge, Zellwerte, Typen, Fo
 
 ## 6. Entscheidungen
 
-1. **Umfang:** Alle 5 Funktionen des Excel-Tools werden portiert. Der Button „BETA AZU“ war im Original mit dem TagList-Makro verknüpft; die Webversion verwendet die eigentliche AZU-Logik aus Modul7 (`FormatHMITextWithErrorCode`) und kennzeichnet sie als Beta.
+1. **Umfang:** Alle 5 Funktionen des Excel-Tools werden portiert. Der Button „AZU“ war im Original mit dem TagList-Makro verknüpft; die Webversion verwendet die eigentliche AZU-Logik aus Modul7 (`FormatHMITextWithErrorCode`).
 2. **Namen:** Die Funktionen heißen in der Webversion *HMI-Variablen*, *Textlisten · Klassisch*, *Textlisten · Aktuell*, *HMI-Meldungen* und *Meldetexte umbrechen*.
 3. **`.xls`:** wird mit Hinweis abgelehnt.
 4. **Referenzdateien:** stehen noch aus (siehe ABWEICHUNGEN.md).

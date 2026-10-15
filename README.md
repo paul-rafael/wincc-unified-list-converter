@@ -4,7 +4,7 @@
 
 **Excel-Exporte aus dem TIA Portal für WinCC Unified aufbereiten – direkt im Browser.**
 
-[![Live-Demo](https://img.shields.io/badge/Live--Demo-online-7a1f2b?style=for-the-badge)](https://paul-rafael.github.io/wincc-unified-list-converter/)
+[![Live-Demo](https://img.shields.io/badge/Live--Demo-online-a3101f?style=for-the-badge)](https://paul-rafael.github.io/wincc-unified-list-converter/)
 [![Clientseitig](https://img.shields.io/badge/100%25-clientseitig-0a0a0a?style=for-the-badge)](#datenschutz)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-0a0a0a?style=for-the-badge&logo=typescript&logoColor=white)](src)
 
@@ -26,7 +26,7 @@ Bei der Migration eines WinCC-Projekts auf Unified Panels müssen HMI-Variablen,
 | 2 | **Textlisten · Klassisch** | Bereinigt Platzhalter (`<No value>`, `<field ref="0" />`) und Tags, füllt leere Sprachvarianten | `.xlsx` `.xlsm` | `<Name>_MIGUNI.xlsx` |
 | 3 | **Textlisten · Aktuell** | Ersetzt `# / .` und `[ ]` in den Namen von Textlisten und Einträgen | `.xlsx` `.xlsm` | `<Name>.xlsx` |
 | 4 | **HMI-Meldungen** | Erzeugt die Unified-Alarmliste `DiscreteAlarms` (44 Spalten) inkl. neuer FieldInfo | `.xlsx` `.xlsm` | `Unified_HMI-Alarms.xlsx` |
-| 5 | **Meldetexte umbrechen** <sup>Beta</sup> | Teilt Meldetexte in Fehlercode und Zeilen à max. 80 Zeichen (`¶`) | `.xlsx` `.xlsm` | gleicher Dateiname |
+| 5 | **Meldetexte umbrechen** | Teilt Meldetexte in Fehlercode und Zeilen à max. 80 Zeichen (`¶`) | `.xlsx` `.xlsm` | gleicher Dateiname |
 
 Eine ausführliche Anleitung zu jeder Funktion ist direkt in die Anwendung integriert.
 
@@ -107,7 +107,7 @@ Dateien werden ausschließlich lokal im Browser gelesen und erzeugt. Die Seite l
 
 ## Hinweis
 
-Die Ergebnisse sollten vor dem Import ins Projekt stichprobenartig geprüft werden. *Meldetexte umbrechen* befindet sich noch in der Beta-Phase.
+Die Ergebnisse sollten vor dem Import ins Projekt stichprobenartig geprüft werden.
 
 WinCC und TIA Portal sind Marken ihrer jeweiligen Inhaber. Dieses Projekt ist ein unabhängiges Werkzeug und steht in keiner Verbindung zu den Markeninhabern.
 
