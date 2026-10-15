@@ -14,7 +14,6 @@ export interface ConverterDef {
   /** Name of the button in the original Excel tool. */
   legacyName: string;
   accept: string[];
-  beta?: boolean;
   run: (data: ArrayBuffer, fileName: string) => Promise<ConversionResult>;
 }
 
@@ -55,9 +54,8 @@ export const CONVERTERS: ConverterDef[] = [
     id: 'lineBreaks',
     title: 'Meldetexte umbrechen',
     subtitle: 'Automatischer Zeilenumbruch für lange Meldungen',
-    legacyName: 'BETA AZU',
+    legacyName: 'AZU',
     accept: ['.xlsx', '.xlsm'],
-    beta: true,
     run: convertLineBreaks,
   },
 ];

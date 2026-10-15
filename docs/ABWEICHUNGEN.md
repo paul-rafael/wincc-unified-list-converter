@@ -10,7 +10,7 @@ Referenz: `Unified_Migration_Tool.xlsm` (VBA-Module 1, 2, 3, 7, 8 + Hilfsfunktio
 | HMI TextList Konverter (alt) | **Textlisten · Klassisch** | `Modul2.Clean_TextList_Sheet` |
 | HMI TextList Konverter (neu) | **Textlisten · Aktuell** | `Modul3.ReplaceSpecialCharsInWorkbook` |
 | HMI-Alarm Konverter | **HMI-Meldungen** | `Modul8.ConvertAlarmList_Unified` (+ `ExtractRefs`, `ExtractTagByRef`, `ExtractLengthByRef`) |
-| BETA AZU | **Meldetexte umbrechen** (Beta) | `Modul7.FormatHMITextInFile` / `FormatHMITextWithErrorCode` – im Original war der Button versehentlich mit Modul1 verknüpft |
+| AZU | **Meldetexte umbrechen** | `Modul7.FormatHMITextInFile` / `FormatHMITextWithErrorCode` – im Original war der Button versehentlich mit Modul1 verknüpft |
 
 Nicht portiert (kein Button, unvollständig): `Excel_Bereinigen` (Modul4/5), `ConvertAlarmLists2` (Modul9–11).
 

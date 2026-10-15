@@ -43,7 +43,7 @@ function renderTypes(): void {
       <span class="type-body">
         <span class="type-title">${c.title}</span>
         <span class="type-sub">${c.subtitle}</span>
-        <span class="type-meta">${c.beta ? '<span class="chip chip-beta">BETA</span>' : ''}${c.accept.map((a) => `<span class="chip">${a}</span>`).join('')}</span>
+        <span class="type-meta">${c.accept.map((a) => `<span class="chip">${a}</span>`).join('')}</span>
       </span>
       <span class="type-check">${svg('<path d="M20 6 9 17l-5-5"/>')}</span>`;
     label.title = `Entspricht „${c.legacyName}“ im Excel-Tool`;

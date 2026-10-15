@@ -1,6 +1,6 @@
 /**
- * Meldetexte umbrechen (Beta) – port of Modul7.FormatHMITextInFile / FormatHMITextWithErrorCode
- * (Button "BETA AZU", automatischer Zeilenumbruch).
+ * Meldetexte umbrechen – port of Modul7.FormatHMITextInFile / FormatHMITextWithErrorCode
+ * (Button "AZU", automatischer Zeilenumbruch).
  *
  * First sheet, rows 2..last used row of column A: the alarm text in column C is split into
  * "error code ¶ line 2 ¶ line 3" (max. 80 characters per line, forced breaks before keywords),
