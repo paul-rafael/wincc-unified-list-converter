@@ -2,8 +2,8 @@
  * PRH Design Kit · v1.0
  * Paul-Rafael Hasan-Man
  *
- * Gemeinsamer Stil für alle Projekte: elegant, zurückhaltend, mit dunkelroten
- * und dezent navyblauen Akzenten. Heller und dunkler Modus folgen automatisch
+ * Gemeinsamer Stil für alle Projekte: elegant, zurückhaltend, Schwarz/Weiß mit
+ * dunkelroten Akzenten. Heller und dunkler Modus folgen automatisch
  * der Systemeinstellung; erzwingen mit <html data-theme="light|dark">.
  *
  * Aufbau:
@@ -17,32 +17,32 @@
   /* Flächen */
   --pr-bg: #ffffff;
   --pr-surface: #ffffff;
-  --pr-surface-2: #f8f9fb;
-  --pr-border: #e6e8ec;
-  --pr-border-strong: #d0d4db;
+  --pr-surface-2: #f8f8f8;
+  --pr-border: #e7e7e7;
+  --pr-border-strong: #d2d2d2;
 
   /* Text */
-  --pr-text: #12151b;
-  --pr-text-2: #4a505b;
-  --pr-text-3: #8a909b;
+  --pr-text: #121212;
+  --pr-text-2: #4b4b4b;
+  --pr-text-3: #8a8a8a;
 
   /* Akzent 1 · Dunkelrot (Hauptaktionen, Auswahl, Hervorhebung) */
-  --pr-red: #a3101f;
-  --pr-red-hover: #850c19;
-  --pr-red-text: #a3101f;
-  --pr-red-soft: #fbeeef;
-  --pr-red-ring: rgba(163, 16, 31, 0.16);
+  --pr-red: #8a0b18;
+  --pr-red-hover: #6d0812;
+  --pr-red-text: #8a0b18;
+  --pr-red-soft: #f9ecee;
+  --pr-red-ring: rgba(138, 11, 24, 0.16);
 
-  /* Akzent 2 · Navy (sekundär und dezent: Info, Nummern, Symbole, Logo-Kachel) */
-  --pr-navy: #1c2b49;
-  --pr-navy-text: #2b4470;
-  --pr-navy-soft: #eef2f8;
-  --pr-navy-ring: rgba(43, 68, 112, 0.16);
+  /* Akzent 2 · Schwarz (im Dunkelmodus Weiß): Nummern, Symbole, Info, Zweit-Buttons */
+  --pr-ink: #121212;
+  --pr-ink-soft: #f4f4f4;
+  --pr-ink-ring: rgba(18, 18, 18, 0.14);
+  --pr-on-ink: #ffffff;
 
   /* Sonstiges */
-  --pr-code-bg: #f3f4f7;
+  --pr-code-bg: #f3f3f3;
   --pr-on-accent: #ffffff;
-  --pr-shadow: 0 1px 2px rgba(18, 21, 27, 0.04), 0 10px 30px rgba(18, 21, 27, 0.05);
+  --pr-shadow: 0 1px 2px rgba(18, 18, 18, 0.04), 0 10px 30px rgba(18, 18, 18, 0.05);
 
   /* Schrift */
   --pr-font: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -61,48 +61,48 @@
 /* Dunkler Modus – automatisch … */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --pr-bg: #0a0b0e;
-    --pr-surface: #101319;
-    --pr-surface-2: #151922;
-    --pr-border: #222733;
-    --pr-border-strong: #323949;
-    --pr-text: #eef0f3;
-    --pr-text-2: #b2b8c3;
-    --pr-text-3: #7c8391;
-    --pr-red: #b3121f;
-    --pr-red-hover: #cc1a29;
-    --pr-red-text: #dc2f3c;
-    --pr-red-soft: #1f0709;
-    --pr-red-ring: rgba(220, 47, 60, 0.25);
-    --pr-navy: #24365a;
-    --pr-navy-text: #8fa6cf;
-    --pr-navy-soft: #121a29;
-    --pr-navy-ring: rgba(143, 166, 207, 0.22);
-    --pr-code-bg: #181c26;
+    --pr-bg: #0a0a0a;
+    --pr-surface: #111111;
+    --pr-surface-2: #161616;
+    --pr-border: #232323;
+    --pr-border-strong: #343434;
+    --pr-text: #f0f0f0;
+    --pr-text-2: #b5b5b5;
+    --pr-text-3: #7f7f7f;
+    --pr-red: #9a0e1b;
+    --pr-red-hover: #b31220;
+    --pr-red-text: #c7232f;
+    --pr-red-soft: #1b0608;
+    --pr-red-ring: rgba(199, 35, 47, 0.25);
+    --pr-ink: #f0f0f0;
+    --pr-ink-soft: #171717;
+    --pr-ink-ring: rgba(240, 240, 240, 0.18);
+    --pr-on-ink: #0a0a0a;
+    --pr-code-bg: #1a1a1a;
     --pr-shadow: none;
     color-scheme: dark;
   }
 }
 /* … oder erzwungen */
 :root[data-theme='dark'] {
-  --pr-bg: #0a0b0e;
-  --pr-surface: #101319;
-  --pr-surface-2: #151922;
-  --pr-border: #222733;
-  --pr-border-strong: #323949;
-  --pr-text: #eef0f3;
-  --pr-text-2: #b2b8c3;
-  --pr-text-3: #7c8391;
-  --pr-red: #b3121f;
-  --pr-red-hover: #cc1a29;
-  --pr-red-text: #dc2f3c;
-  --pr-red-soft: #1f0709;
-  --pr-red-ring: rgba(220, 47, 60, 0.25);
-  --pr-navy: #24365a;
-  --pr-navy-text: #8fa6cf;
-  --pr-navy-soft: #121a29;
-  --pr-navy-ring: rgba(143, 166, 207, 0.22);
-  --pr-code-bg: #181c26;
+  --pr-bg: #0a0a0a;
+  --pr-surface: #111111;
+  --pr-surface-2: #161616;
+  --pr-border: #232323;
+  --pr-border-strong: #343434;
+  --pr-text: #f0f0f0;
+  --pr-text-2: #b5b5b5;
+  --pr-text-3: #7f7f7f;
+  --pr-red: #9a0e1b;
+  --pr-red-hover: #b31220;
+  --pr-red-text: #c7232f;
+  --pr-red-soft: #1b0608;
+  --pr-red-ring: rgba(199, 35, 47, 0.25);
+  --pr-ink: #f0f0f0;
+  --pr-ink-soft: #171717;
+  --pr-ink-ring: rgba(240, 240, 240, 0.18);
+  --pr-on-ink: #0a0a0a;
+  --pr-code-bg: #1a1a1a;
   --pr-shadow: none;
   color-scheme: dark;
 }
@@ -129,7 +129,7 @@ pre { background: var(--pr-code-bg); padding: 14px 16px; border-radius: var(--pr
 pre code { background: none; padding: 0; }
 kbd { border: 1px solid var(--pr-border-strong); border-bottom-width: 2px; border-radius: 4px; padding: 0 0.35em; background: var(--pr-surface); }
 ::selection { background: var(--pr-red-soft); color: var(--pr-text); }
-:focus-visible { outline: 2px solid var(--pr-navy-text); outline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--pr-ink); outline-offset: 2px; }
 
 /* ------------------------------------------------------------------ 3. Bausteine */
 
@@ -142,7 +142,7 @@ kbd { border: 1px solid var(--pr-border-strong); border-bottom-width: 2px; borde
 .pr-header-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; height: var(--pr-header-h); }
 .pr-brand { display: inline-flex; align-items: center; gap: 10px; color: var(--pr-text); text-decoration: none; font-weight: 600; letter-spacing: -0.01em; }
 .pr-brand:hover { color: var(--pr-text); }
-.pr-brand img, .pr-brand svg { width: 28px; height: 28px; border-radius: 7px; display: block; }
+.pr-brand .pr-logo { height: 24px; }
 .pr-brand small { color: var(--pr-text-3); font-weight: 400; font-size: inherit; }
 .pr-nav { display: flex; align-items: center; gap: 24px; font-size: 14.5px; }
 .pr-nav a { color: var(--pr-text-2); text-decoration: none; }
@@ -160,8 +160,8 @@ kbd { border: 1px solid var(--pr-border-strong); border-bottom-width: 2px; borde
 .pr-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 22px; border-radius: 8px; border: 1px solid transparent; font: inherit; font-weight: 600; font-size: 15px; cursor: pointer; text-decoration: none; transition: background 0.2s, border-color 0.2s, color 0.2s, opacity 0.2s; }
 .pr-btn-primary { background: var(--pr-red); color: var(--pr-on-accent); }
 .pr-btn-primary:hover { background: var(--pr-red-hover); color: var(--pr-on-accent); }
-.pr-btn-secondary { background: var(--pr-navy); color: var(--pr-on-accent); }
-.pr-btn-secondary:hover { background: color-mix(in srgb, var(--pr-navy) 85%, #fff); color: var(--pr-on-accent); }
+.pr-btn-secondary { background: var(--pr-ink); color: var(--pr-on-ink); }
+.pr-btn-secondary:hover { background: color-mix(in srgb, var(--pr-ink) 82%, var(--pr-bg)); color: var(--pr-on-ink); }
 .pr-btn-ghost { background: transparent; border-color: var(--pr-border-strong); color: var(--pr-text); }
 .pr-btn-ghost:hover { border-color: var(--pr-text); color: var(--pr-text); }
 .pr-btn:disabled { opacity: 0.35; cursor: not-allowed; }
@@ -178,13 +178,13 @@ kbd { border: 1px solid var(--pr-border-strong); border-bottom-width: 2px; borde
 
 /* Kleine Elemente */
 .pr-chip { display: inline-block; font-family: var(--pr-mono); font-size: 11px; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--pr-border); color: var(--pr-text-3); }
-.pr-badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 9px; border-radius: 999px; background: var(--pr-navy-soft); color: var(--pr-navy-text); }
-.pr-number { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--pr-navy-text); color: var(--pr-navy-text); font-size: 12.5px; font-weight: 600; }
-.pr-icon-box { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 9px; border: 1px solid var(--pr-border); color: var(--pr-navy-text); }
+.pr-badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 9px; border-radius: 999px; background: var(--pr-ink-soft); color: var(--pr-ink); }
+.pr-number { display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--pr-ink); color: var(--pr-ink); font-size: 12.5px; font-weight: 600; }
+.pr-icon-box { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 9px; border: 1px solid var(--pr-border); color: var(--pr-ink); }
 .pr-divider { border: 0; border-top: 1px solid var(--pr-border); margin: 32px 0; }
 
 /* Hinweise */
-.pr-note { padding: 12px 16px; border-radius: var(--pr-radius-sm); border-left: 2px solid var(--pr-navy-text); background: var(--pr-navy-soft); font-size: 14.5px; }
+.pr-note { padding: 12px 16px; border-radius: var(--pr-radius-sm); border-left: 2px solid var(--pr-ink); background: var(--pr-ink-soft); font-size: 14.5px; }
 .pr-note-accent { border-left-color: var(--pr-red); background: var(--pr-red-soft); }
 .pr-alert { display: flex; gap: 12px; padding: 16px 18px; border-radius: var(--pr-radius); border: 1px solid color-mix(in srgb, var(--pr-red) 45%, transparent); background: var(--pr-red-soft); }
 .pr-success { display: flex; gap: 12px; padding: 16px 18px; border-radius: var(--pr-radius); border: 1px solid var(--pr-border); background: var(--pr-surface-2); }
@@ -198,7 +198,7 @@ kbd { border: 1px solid var(--pr-border-strong); border-bottom-width: 2px; borde
 /* Formulare */
 .pr-label { display: block; font-size: 13.5px; font-weight: 600; margin-bottom: 6px; }
 .pr-input, .pr-select, .pr-textarea { width: 100%; font: inherit; font-size: 15px; color: var(--pr-text); background: var(--pr-surface); border: 1px solid var(--pr-border-strong); border-radius: 8px; padding: 10px 12px; transition: border-color 0.2s, box-shadow 0.2s; }
-.pr-input:focus, .pr-select:focus, .pr-textarea:focus { outline: none; border-color: var(--pr-navy-text); box-shadow: 0 0 0 3px var(--pr-navy-ring); }
+.pr-input:focus, .pr-select:focus, .pr-textarea:focus { outline: none; border-color: var(--pr-ink); box-shadow: 0 0 0 3px var(--pr-ink-ring); }
 .pr-dropzone { display: grid; place-items: center; gap: 6px; padding: 44px 20px; border: 1px dashed var(--pr-border-strong); border-radius: var(--pr-radius); background: var(--pr-surface-2); text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
 .pr-dropzone:hover, .pr-dropzone.is-dragging { border-color: var(--pr-red); background: var(--pr-red-soft); }
 
@@ -214,7 +214,7 @@ kbd { border: 1px solid var(--pr-border-strong); border-bottom-width: 2px; borde
 .pr-footer a:hover { color: var(--pr-red-text); }
 .pr-signature { display: inline-flex; align-items: center; gap: 10px; color: var(--pr-text-3); text-decoration: none; font-size: 12px; letter-spacing: 0.02em; }
 .pr-signature .pr-logo { height: 22px; opacity: 0.55; transition: opacity 0.2s; }
-.pr-signature:hover { color: var(--pr-navy-text); }
+.pr-signature:hover { color: var(--pr-text); }
 .pr-signature:hover .pr-logo { opacity: 0.9; }
 
 /* Logo in Textfarbe (passt sich hell/dunkel an): <span class="pr-logo" aria-hidden="true"></span> */
