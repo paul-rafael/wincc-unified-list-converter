@@ -1,12 +1,12 @@
 # PRH Design Kit
 
-Gemeinsamer Stil für alle Projekte von Paul-Rafael Hasan-Man: elegant und zurückhaltend, mit dunkelroten Hauptakzenten und dezentem Navy als Zweitakzent. Heller und dunkler Modus funktionieren automatisch.
+Gemeinsamer Stil für alle Projekte von Paul-Rafael Hasan-Man: elegant und zurückhaltend, Schwarz/Weiß mit dunkelroten Akzenten. Heller und dunkler Modus funktionieren automatisch.
 
 | Datei | Zweck |
 |---|---|
 | `brand.css` | Farben, Schrift und Bausteine (Klassen mit Präfix `pr-`) |
 | `logo.svg` | Signatur als Vektorgrafik, Farbe folgt dem Text (`currentColor`) |
-| `favicon.svg` | Logo-Kachel für den Browser-Tab und die Kopfzeile |
+| `favicon.svg` | Logo-Kachel für den Browser-Tab |
 | `template.html` | Startvorlage für ein neues Projekt |
 | `preview.html` | Übersicht aller Farben und Bausteine (im Browser öffnen) |
 
@@ -40,9 +40,9 @@ Immer über die Variablen verwenden, nie Farbwerte direkt eintragen – dann sti
 | `--pr-border`, `--pr-border-strong` | Rahmen und Trennlinien |
 | `--pr-red`, `--pr-red-hover` | Hauptaktionen (Buttons), Auswahl |
 | `--pr-red-text`, `--pr-red-soft` | dunkelrote Schrift, zarter roter Hintergrund |
-| `--pr-navy`, `--pr-navy-text`, `--pr-navy-soft` | dezenter Zweitakzent: Info-Hinweise, Nummern, Symbole |
+| `--pr-ink`, `--pr-ink-soft` | Zweitakzent Schwarz (im Dunkelmodus Weiß): Nummern, Symbole, Info-Hinweise, Zweit-Buttons |
 
-**Faustregel:** Dunkelrot für das, was der Nutzer *tun* soll, Navy für das, was er *wissen* soll. Beides sparsam einsetzen – der Großteil der Seite bleibt Schwarz/Weiß.
+**Faustregel:** Dunkelrot für das, was der Nutzer *tun* soll, Schwarz für das, was er *wissen* soll. Beides sparsam einsetzen – der Großteil der Seite bleibt Schwarz/Weiß.
 
 ## Bausteine
 

@@ -23,7 +23,7 @@
     <header class="pr-header">
       <div class="pr-container pr-header-inner">
         <a class="pr-brand" href="#">
-          <img src="favicon.svg" alt="" />
+          <span class="pr-logo" aria-hidden="true"></span>
           <span>PRH Design Kit <small>v1.0</small></span>
         </a>
         <nav class="pr-nav">
@@ -38,7 +38,7 @@
       <section class="pr-hero">
         <span class="pr-eyebrow">Design Kit</span>
         <h1 class="pr-title">Ein Stil für <em>alle Projekte</em></h1>
-        <p class="pr-lead">Elegant und zurückhaltend: Weiß bzw. Schwarz als Grund, Dunkelrot für Aktionen, Navy als dezenter Zweitakzent.</p>
+        <p class="pr-lead">Elegant und zurückhaltend: Weiß bzw. Schwarz als Grund, Dunkelrot für Aktionen, Schwarz als ruhiger Zweitakzent.</p>
       </section>
 
       <section class="block" id="logo">
@@ -51,7 +51,7 @@
           </div>
           <div class="pr-card">
             <h3>Verwendung</h3>
-            <p>Im Browser-Tab (Favicon), klein in der Kopfzeile und als Signatur in der Fußzeile – nie groß im Inhalt.</p>
+            <p>Als Kachel im Browser-Tab (Favicon), als feine Signatur in Kopf- und Fußzeile – nie groß im Inhalt.</p>
           </div>
         </div>
       </section>
@@ -83,7 +83,7 @@
             <label class="pr-card pr-card-select"><input type="radio" name="c" hidden /><h3>Zweite Option</h3><p>Klicken zum Auswählen.</p></label>
             <div class="pr-card"><h3>Karte</h3><p>Für Hinweise, Funktionen oder Kennzahlen.</p></div>
           </div>
-          <p class="pr-note"><strong>Hinweis:</strong> Dezente Info in Navy.</p>
+          <p class="pr-note"><strong>Hinweis:</strong> Dezente Info in Schwarz.</p>
           <p class="pr-note pr-note-accent"><strong>Wichtig:</strong> Betonter Hinweis in Dunkelrot.</p>
           <div class="pr-alert"><strong>Fehler</strong> Etwas ist schiefgelaufen.</div>
           <div class="pr-success"><strong>Fertig</strong> Aktion erfolgreich abgeschlossen.</div>
@@ -112,7 +112,7 @@
       const tokens = [
         ['Hintergrund', '--pr-bg'], ['Fläche', '--pr-surface-2'], ['Rahmen', '--pr-border'], ['Text', '--pr-text'],
         ['Text 2', '--pr-text-2'], ['Dunkelrot', '--pr-red'], ['Dunkelrot Text', '--pr-red-text'], ['Dunkelrot zart', '--pr-red-soft'],
-        ['Navy', '--pr-navy'], ['Navy Text', '--pr-navy-text'], ['Navy zart', '--pr-navy-soft'],
+        ['Schwarz-Akzent', '--pr-ink'], ['Schwarz zart', '--pr-ink-soft'],
       ];
       const render = () => {
         const cs = getComputedStyle(document.documentElement);
