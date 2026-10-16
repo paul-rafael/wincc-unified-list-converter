@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WinCC Unified List Converter</title>
+    <meta name="description" content="Excel-Exporte aus dem TIA Portal (HMI-Variablen, Textlisten, HMI-Meldungen) für WinCC Unified aufbereiten – direkt im Browser, ohne Upload." />
+    <link rel="icon" type="image/svg+xml" href="./assets/favicon-De4JKATn.svg" />
+    <meta name="author" content="Paul-Rafael Hasan-Man" />
+    <script type="module" crossorigin src="./assets/index-Ba6cBYkW.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-BzY-RBvu.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="wrap topbar-inner">
+        <a class="brand" href="#top" aria-label="WinCC Unified List Converter">
+          <span class="pr-logo brand-logo" aria-hidden="true"></span>
+          <span class="brand-name">WinCC Unified <span>List Converter</span></span>
+        </a>
+        <nav class="topnav">
+          <a href="#converter">Konverter</a>
+          <a href="#anleitung">Anleitung</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero-band">
+        <div class="hero wrap">
+          <p class="eyebrow">TIA Portal → WinCC Unified</p>
+          <h1>Excel-Listen für <em>WinCC Unified</em> aufbereiten</h1>
+          <p class="lead">
+            Konvertiert exportierte HMI-Variablen, Textlisten und HMI-Meldungen in ein Format, das WinCC Unified akzeptiert.
+            Datei auswählen, konvertieren, herunterladen – kostenlos, ohne Anmeldung und ohne Upload.
+          </p>
+        </div>
+      </section>
+
+      <section id="converter" class="wrap">
+        <div class="panel">
+          <div class="step">
+            <div class="step-head">
+              <span class="step-no">1</span>
+              <h2>Liste wählen</h2>
+            </div>
+            <div class="types" role="radiogroup" aria-label="Art der Liste" id="types"></div>
+          </div>
+
+          <div class="step">
+            <div class="step-head">
+              <span class="step-no">2</span>
+              <h2>Datei hochladen</h2>
+            </div>
+            <label class="dropzone" id="dropzone" tabindex="0">
+              <input type="file" id="file-input" hidden />
+              <span class="dz-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M12 16V4" /><path d="m7 9 5-5 5 5" /><path d="M20 16v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3" /></svg>
+              </span>
+              <span class="dz-title">Excel-Datei hierher ziehen</span>
+              <span class="dz-sub">oder <span class="link">vom Computer auswählen</span></span>
+              <span class="dz-accept" id="accept-hint"></span>
+            </label>
+            <div class="file-row" id="file-row" hidden>
+              <span class="file-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" /><path d="M14 3v5h5" /><path d="m9 13 2 2 4-4" /></svg>
+              </span>
+              <span class="file-meta">
+                <span class="file-name" id="file-name"></span>
+                <span class="file-size" id="file-size"></span>
+              </span>
+              <button type="button" class="icon-btn" id="file-remove" aria-label="Datei entfernen" title="Datei entfernen">
+                <svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12" /></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button type="button" class="btn btn-primary" id="convert" disabled>
+              <span class="btn-label">Konvertieren</span>
+              <span class="spinner" aria-hidden="true"></span>
+            </button>
+            <p class="status" id="status" role="status" aria-live="polite"></p>
+          </div>
+
+          <div class="result" id="result" hidden>
+            <div class="result-head">
+              <span class="result-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" /></svg>
+              </span>
+              <div>
+                <h3>Konvertierung abgeschlossen</h3>
+                <p id="result-summary"></p>
+              </div>
+            </div>
+            <div class="result-actions">
+              <a class="btn btn-primary" id="download" download>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v12" /><path d="m7 11 5 5 5-5" /><path d="M4 20h16" /></svg>
+                <span id="download-label">Herunterladen</span>
+              </a>
+              <button type="button" class="btn btn-ghost" id="again">Weitere Datei konvertieren</button>
+            </div>
+            <details class="notices" id="notices" hidden>
+              <summary id="notices-summary"></summary>
+              <ul id="notices-list"></ul>
+            </details>
+          </div>
+
+          <div class="error" id="error" role="alert" hidden>
+            <span class="error-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M12 8v5M12 16.5v.01" /></svg>
+            </span>
+            <div>
+              <h3>Konvertierung nicht möglich</h3>
+              <p id="error-text"></p>
+            </div>
+          </div>
+        </div>
+        <p class="privacy-note">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6z" /></svg>
+          Deine Dateien verlassen deinen Rechner nicht: Die Konvertierung läuft vollständig in diesem Browserfenster, ohne Server, Konto oder Speicherung.
+        </p>
+      </section>
+
+      <section id="anleitung" class="wrap guide">
+        <div class="section-head">
+          <p class="eyebrow">Anleitung</p>
+          <h2>So funktioniert der Converter</h2>
+          <p>Jede Funktion erwartet eine Exportdatei aus dem TIA Portal und liefert eine Datei zurück, die du wieder importierst bzw. einfügst.</p>
+        </div>
+
+        <ol class="flow">
+          <li>
+            <span class="flow-no">1</span>
+            <h3>Exportieren</h3>
+            <p>Im alten WinCC-Projekt die Liste (HMI-Variablen, Textlisten oder HMI-Meldungen) als <code>.xlsx</code> exportieren.</p>
+          </li>
+          <li>
+            <span class="flow-no">2</span>
+            <h3>Konvertieren</h3>
+            <p>Oben den passenden Listentyp wählen, die Exportdatei hochladen und das Ergebnis herunterladen.</p>
+          </li>
+          <li>
+            <span class="flow-no">3</span>
+            <h3>Übernehmen &amp; prüfen</h3>
+            <p>Die bereinigte Liste ins Projekt übernehmen, das Projekt übersetzen und die Ergebnisse stichprobenartig prüfen.</p>
+          </li>
+        </ol>
+
+        <div class="tabs" role="tablist" aria-label="Konverter" id="guide-tabs"></div>
+
+        <article class="guide-panel" data-guide="tags" hidden>
+          <div class="guide-grid">
+            <div>
+              <h3>Wofür?</h3>
+              <p>WinCC Unified akzeptiert in Variablennamen keine Sonderzeichen wie <code>[ ] / # .</code>. Die Bereinigung sollte <strong>vor</strong> der Konvertierung mit Data2Unified erfolgen, da sonst Verwendungsstellen teilweise nicht übernommen werden.</p>
+              <h3>So gehst du vor</h3>
+              <ol class="steps">
+                <li>Im alten Projekt die HMI-Variablen <strong>alphabetisch nach Namen</strong> sortieren und exportieren.</li>
+                <li>Oben <em>HMI-Variablen</em> wählen, Datei hochladen, konvertieren und <code>HMITagList_MIGUNI.xlsx</code> herunterladen.</li>
+                <li>Die bereinigten Variablen in Excel A–Z sortieren: Zelle <kbd>A2</kbd> markieren, <kbd>Strg</kbd>+<kbd>Shift</kbd>+<kbd>→</kbd>, dann <kbd>Strg</kbd>+<kbd>Shift</kbd>+<kbd>↓</kbd>, Rechtsklick → Sortieren → A–Z.</li>
+                <li>Die korrigierten Namen in die HMI-Variablen einfügen. Beide Tabellen müssen A–Z sortiert sein, es werden <strong>nur die Namen</strong> ersetzt (erste Variable markieren, <kbd>Strg</kbd>+<kbd>Shift</kbd>+<kbd>↓</kbd>).</li>
+              </ol>
+            </div>
+            <aside class="rules">
+              <h4>Was genau geändert wird</h4>
+              <ul>
+                <li>Erstes Tabellenblatt, Spalte A, ab Zeile 1 bis zur letzten befüllten Zeile.</li>
+                <li>Jedes Zeichen außer <code>A–Z</code>, <code>a–z</code>, <code>0–9</code> wird zu <code>_</code> – auch Umlaute, ß, Leerzeichen und Bindestriche.</li>
+                <li>Alle anderen Spalten, Blätter und Formatierungen bleiben unverändert.</li>
+                <li>Eingabe: <code>.xlsx</code> · Ergebnis: <code>HMITagList_MIGUNI.xlsx</code></li>
+              </ul>
+            </aside>
+          </div>
+        </article>
+
+        <article class="guide-panel" data-guide="textlistLegacy" hidden>
+          <div class="guide-grid">
+            <div>
+              <h3>Wofür?</h3>
+              <p>Für Textlisten <strong>älterer Panel-Projekte</strong>, deren Export Platzhalter wie <code>&lt;No value&gt;</code> oder <code>&lt;field ref="0" /&gt;</code> enthält. Ungültige Objekte werden entfernt, leere Sprachvarianten werden befüllt. Der Text der Hauptsprache (Spalte E) bleibt unberührt.</p>
+              <h3>So gehst du vor</h3>
+              <ol class="steps">
+                <li>Die Textlisten im alten Projekt exportieren.</li>
+                <li>Oben <em>Textlisten · Klassisch</em> wählen, Datei hochladen und konvertieren.</li>
+                <li>Mit der Ergebnisdatei wie bei den HMI-Variablen verfahren: sortieren und die bereinigten Einträge übernehmen.</li>
+              </ol>
+            </div>
+            <aside class="rules">
+              <h4>Was genau geändert wird</h4>
+              <ul>
+                <li>Blatt <code>TextListEntry</code>, Spalten E–J, ab Zeile 2.</li>
+                <li><code>&lt;No value&gt;</code> → Text aus Spalte I bzw. TextList-Name aus Spalte K, sonst <code>—</code>.</li>
+                <li><code>&lt;field ref="0" /&gt;</code> → TextList-Name aus Spalte K, sonst <code>—</code>.</li>
+                <li>Andere <code>&lt;…&gt;</code>-Tags werden entfernt, doppelte Leerzeichen zusammengefasst. Leere Zellen in F–J werden zu <code>—</code>.</li>
+                <li>Spalte E wird nur bei <code>&lt;No value&gt;</code> oder <code>&lt;field ref="0" /&gt;</code> angepasst.</li>
+                <li>Eingabe: <code>.xlsx</code>, <code>.xlsm</code> · Ergebnis: <code>&lt;Name&gt;_MIGUNI.xlsx</code></li>
+              </ul>
+            </aside>
+          </div>
+        </article>
+
+        <article class="guide-panel" data-guide="textlistStandard" hidden>
+          <div class="guide-grid">
+            <div>
+              <h3>Wofür?</h3>
+              <p>Für Textlisten <strong>neuerer Panel-Projekte</strong>, deren Texte bereits sauber sind. Die Namen der Textlisten und Einträge werden in eine von Unified akzeptierte Schreibweise gebracht.</p>
+              <h3>So gehst du vor</h3>
+              <ol class="steps">
+                <li>Die Textlisten im alten Projekt exportieren.</li>
+                <li>Oben <em>Textlisten · Aktuell</em> wählen, Datei hochladen und konvertieren.</li>
+                <li>Die Ergebnisdatei wieder importieren bzw. die Namen wie bei den HMI-Variablen übernehmen.</li>
+              </ol>
+            </div>
+            <aside class="rules">
+              <h4>Was genau geändert wird</h4>
+              <ul>
+                <li>Blatt <code>TextList</code> Spalte A und Blatt <code>TextListEntry</code> Spalte B, jeweils ab Zeile 2.</li>
+                <li><code>#</code>, <code>/</code> und <code>.</code> werden zu <code>_</code>; <code>[</code> wird zu <code>(</code>, <code>]</code> zu <code>)</code>.</li>
+                <li>Fehlt eines der Blätter, wird es mit Hinweis übersprungen.</li>
+                <li>Eingabe: <code>.xlsx</code>, <code>.xlsm</code> · Ergebnis: gleicher Dateiname als <code>.xlsx</code></li>
+              </ul>
+            </aside>
+          </div>
+        </article>
+
+        <article class="guide-panel" data-guide="alarms" hidden>
+          <div class="guide-grid">
+            <div>
+              <h3>Wofür?</h3>
+              <p>Unified Panels sind anders aufgebaut als WinCC-Advanced-Panels und haben mehr Attribute. Variablen in Meldetexten werden von Data2Unified nicht übernommen, weil sich die FieldInfo-Struktur geändert hat (<code>AlarmTag</code> → <code>AlarmParameterWithOrWithoutCommonTextList</code>).</p>
+              <h3>So gehst du vor</h3>
+              <ol class="steps">
+                <li>Die HMI-Meldungen (Bitmeldungen) des alten Panels exportieren.</li>
+                <li>Oben <em>HMI-Meldungen</em> wählen, Datei hochladen und <code>Unified_HMI-Alarms.xlsx</code> herunterladen.</li>
+                <li>Die Datei im migrierten Unified-Projekt importieren.</li>
+                <li>Die Meldeanzeige prüfen – eine manuelle Kontrolle wird empfohlen.</li>
+              </ol>
+            </div>
+            <aside class="rules">
+              <h4>Was genau geändert wird</h4>
+              <ul>
+                <li>Neue Datei mit Blatt <code>DiscreteAlarms</code> und den 44 Unified-Spalten.</li>
+                <li>ID, Name, Meldetext, Klasse, Triggervariable und Triggerbit werden übernommen.</li>
+                <li>Trigger mode <code>On rising edge</code>, Quittierung <code>&lt;No value&gt;</code> / <code>0</code>, Priorität <code>0</code>, Area <code>HMI_RT_2::Alarming</code>.</li>
+                <li>Variablen im Meldetext (<code>&lt;field ref="n" /&gt;</code>) werden zur neuen FieldInfo; die Variable landet in <em>Alarm parameter 1</em>.</li>
+                <li>Eingabe: <code>.xlsx</code>, <code>.xlsm</code> · Ergebnis: <code>Unified_HMI-Alarms.xlsx</code></li>
+              </ul>
+            </aside>
+          </div>
+        </article>
+
+        <article class="guide-panel" data-guide="lineBreaks" hidden>
+          <div class="guide-grid">
+            <div>
+              <h3>Wofür?</h3>
+              <p>Unified Panels brechen lange Melde- und Alarmtexte nicht mehr automatisch um. Der Umbruch muss deshalb direkt im Meldetext hinterlegt werden – diese Funktion erledigt das für die ganze Liste.</p>
+              <p class="guide-note"><strong>Tipp:</strong> Die umgebrochenen Texte kurz am Panel kontrollieren – bei sehr langen Meldungen kann eine manuelle Feinanpassung sinnvoll sein.</p>
+              <h3>So gehst du vor</h3>
+              <ol class="steps">
+                <li>Die HMI-Meldungen exportieren (oder die Datei aus <em>HMI-Meldungen</em> verwenden).</li>
+                <li>Oben <em>Meldetexte umbrechen</em> wählen, Datei hochladen und konvertieren.</li>
+                <li>Die Datei importieren und die Darstellung der Meldungen am Panel prüfen.</li>
+              </ol>
+            </div>
+            <aside class="rules">
+              <h4>Was genau geändert wird</h4>
+              <ul>
+                <li>Erstes Tabellenblatt, Spalte C (Meldetext), ab Zeile 2.</li>
+                <li>Der Text bis zum ersten <code>_</code> wird als Fehlercode in die erste Zeile gestellt.</li>
+                <li>Der restliche Text wird auf Zeilen mit max. 80 Zeichen verteilt, vor <code>Position:</code>, <code>Geschw.:</code>, <code>X:</code>, <code>Y:</code>, <code>Z:</code> wird immer umgebrochen.</li>
+                <li>Zeilen werden mit <code>¶</code> getrennt (höchstens drei Zeilen), Zellen erhalten „Zeilenumbruch“, die Zeilenhöhe passt sich an.</li>
+                <li>Eingabe: <code>.xlsx</code>, <code>.xlsm</code> · Ergebnis: gleicher Dateiname</li>
+              </ul>
+            </aside>
+          </div>
+        </article>
+
+        <div class="cards">
+          <div class="card">
+            <h3>Vor dem Start von Data2Unified</h3>
+            <ul class="checks">
+              <li>Keine Sonderzeichen in Variablen</li>
+              <li>Keine Namenskonflikte</li>
+              <li>Projekt ist fehlerfrei übersetzbar</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Hinweise im Ergebnis</h3>
+            <p>Erkennt der Converter Werte, die Excel möglicherweise anders interpretiert (z. B. Zahlen, Datumswerte, Formeln), wird das als Hinweis mit Zellangabe aufgelistet. Diese Zellen bitte kurz prüfen.</p>
+          </div>
+          <div class="card">
+            <h3>Unterstützte Dateien</h3>
+            <p>Excel-Arbeitsmappen <code>.xlsx</code> und – je nach Konverter – <code>.xlsm</code>. Alte <code>.xls</code>-Dateien bitte zuerst in Excel als <code>.xlsx</code> speichern.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="wrap footer-inner">
+        <span><strong>WinCC Unified List Converter</strong> · Frei nutzbar, ohne Anmeldung · Verarbeitung lokal im Browser</span>
+        <span>Ergebnisse vor dem Import prüfen. <a href="https://github.com/paul-rafael/wincc-unified-list-converter">Quellcode auf GitHub</a></span>
+        <a class="credit pr-signature" href="https://github.com/paul-rafael" title="Entwickelt von Paul-Rafael Hasan-Man"><span class="pr-logo" aria-hidden="true"></span>Entwickelt von Paul-Rafael Hasan-Man</a>
+      </div>
+    </footer>
+
+  </body>
+</html>
