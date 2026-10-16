@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PRH Design Kit</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="stylesheet" href="brand.css" />
+    <style>
+      .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+      .swatch { border: 1px solid var(--pr-border); border-radius: var(--pr-radius); overflow: hidden; font-size: 12.5px; }
+      .swatch div { height: 64px; }
+      .swatch p { padding: 8px 10px; color: var(--pr-text-2); }
+      .swatch code { font-size: 11px; }
+      .grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+      .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+      section.block { padding: 40px 0; }
+      section.block > h2 { margin-bottom: 18px; }
+      .big-logo { font-size: 120px; color: var(--pr-text); }
+    </style>
+  </head>
+  <body>
+    <header class="pr-header">
+      <div class="pr-container pr-header-inner">
+        <a class="pr-brand" href="#">
+          <img src="favicon.svg" alt="" />
+          <span>PRH Design Kit <small>v1.0</small></span>
+        </a>
+        <nav class="pr-nav">
+          <a href="#farben">Farben</a>
+          <a href="#bausteine">Bausteine</a>
+          <button class="pr-btn pr-btn-ghost" type="button" id="theme" style="height: 34px; padding: 0 12px; font-size: 13px">Hell / Dunkel</button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="pr-container">
+      <section class="pr-hero">
+        <span class="pr-eyebrow">Design Kit</span>
+        <h1 class="pr-title">Ein Stil für <em>alle Projekte</em></h1>
+        <p class="pr-lead">Elegant und zurückhaltend: Weiß bzw. Schwarz als Grund, Dunkelrot für Aktionen, Navy als dezenter Zweitakzent.</p>
+      </section>
+
+      <section class="block" id="logo">
+        <h2 class="pr-section-title">Logo</h2>
+        <div class="grid3">
+          <div class="pr-card" style="display: grid; place-items: center"><span class="pr-logo big-logo" aria-hidden="true"></span></div>
+          <div class="pr-card" style="display: grid; place-items: center; gap: 12px">
+            <img src="favicon.svg" width="96" alt="Favicon" />
+            <div class="row"><img src="favicon.svg" width="32" alt="" /><img src="favicon.svg" width="16" alt="" /></div>
+          </div>
+          <div class="pr-card">
+            <h3>Verwendung</h3>
+            <p>Im Browser-Tab (Favicon), klein in der Kopfzeile und als Signatur in der Fußzeile – nie groß im Inhalt.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="block" id="farben">
+        <h2 class="pr-section-title">Farben</h2>
+        <div class="swatches" id="swatches"></div>
+      </section>
+
+      <section class="block" id="bausteine">
+        <h2 class="pr-section-title">Bausteine</h2>
+        <div class="pr-stack">
+          <div class="row">
+            <button class="pr-btn pr-btn-primary">Hauptaktion</button>
+            <button class="pr-btn pr-btn-secondary">Sekundär</button>
+            <button class="pr-btn pr-btn-ghost">Abbrechen</button>
+            <button class="pr-btn pr-btn-primary" disabled>Deaktiviert</button>
+          </div>
+          <div class="row">
+            <span class="pr-badge">Neu</span>
+            <span class="pr-chip">.xlsx</span>
+            <span class="pr-number">1</span>
+            <span class="pr-icon-box"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M4 7h16M4 12h10M4 17h7" /></svg></span>
+            <code>inline code</code>
+            <kbd>Strg</kbd>
+          </div>
+          <div class="grid3">
+            <label class="pr-card pr-card-select"><input type="radio" name="c" hidden checked /><h3>Auswählbare Karte</h3><p>Ausgewählt mit dunkelrotem Rand.</p></label>
+            <label class="pr-card pr-card-select"><input type="radio" name="c" hidden /><h3>Zweite Option</h3><p>Klicken zum Auswählen.</p></label>
+            <div class="pr-card"><h3>Karte</h3><p>Für Hinweise, Funktionen oder Kennzahlen.</p></div>
+          </div>
+          <p class="pr-note"><strong>Hinweis:</strong> Dezente Info in Navy.</p>
+          <p class="pr-note pr-note-accent"><strong>Wichtig:</strong> Betonter Hinweis in Dunkelrot.</p>
+          <div class="pr-alert"><strong>Fehler</strong> Etwas ist schiefgelaufen.</div>
+          <div class="pr-success"><strong>Fertig</strong> Aktion erfolgreich abgeschlossen.</div>
+          <div class="pr-tabs"><button class="pr-tab active">Erster Tab</button><button class="pr-tab">Zweiter Tab</button><button class="pr-tab">Dritter Tab</button></div>
+          <div class="grid3">
+            <div><label class="pr-label" for="i1">Eingabefeld</label><input class="pr-input" id="i1" placeholder="Text eingeben" /></div>
+            <div><label class="pr-label" for="i2">Auswahl</label><select class="pr-select" id="i2"><option>Option A</option><option>Option B</option></select></div>
+          </div>
+          <div class="pr-dropzone">Datei hierher ziehen</div>
+          <table class="pr-table">
+            <thead><tr><th>Name</th><th>Wert</th><th>Status</th></tr></thead>
+            <tbody><tr><td>Motor_1</td><td>42</td><td><span class="pr-badge">OK</span></td></tr><tr><td>Ventil_2</td><td>7</td><td><span class="pr-chip">offen</span></td></tr></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="pr-footer">
+      <div class="pr-container pr-footer-inner">
+        <span><strong>PRH Design Kit</strong> · v1.0</span>
+        <a class="pr-signature" href="https://github.com/paul-rafael"><span class="pr-logo" aria-hidden="true"></span>Paul-Rafael Hasan-Man</a>
+      </div>
+    </footer>
+
+    <script>
+      const tokens = [
+        ['Hintergrund', '--pr-bg'], ['Fläche', '--pr-surface-2'], ['Rahmen', '--pr-border'], ['Text', '--pr-text'],
+        ['Text 2', '--pr-text-2'], ['Dunkelrot', '--pr-red'], ['Dunkelrot Text', '--pr-red-text'], ['Dunkelrot zart', '--pr-red-soft'],
+        ['Navy', '--pr-navy'], ['Navy Text', '--pr-navy-text'], ['Navy zart', '--pr-navy-soft'],
+      ];
+      const render = () => {
+        const cs = getComputedStyle(document.documentElement);
+        document.getElementById('swatches').innerHTML = tokens
+          .map(([n, v]) => `<div class="swatch"><div style="background:var(${v})"></div><p>${n}<br><code>${v}</code> ${cs.getPropertyValue(v).trim()}</p></div>`)
+          .join('');
+      };
+      document.getElementById('theme').onclick = () => {
+        const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+        const cur = document.documentElement.dataset.theme || (dark ? 'dark' : 'light');
+        document.documentElement.dataset.theme = cur === 'dark' ? 'light' : 'dark';
+        render();
+      };
+      render();
+    </script>
+  </body>
+</html>
