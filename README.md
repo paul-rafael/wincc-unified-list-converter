@@ -73,7 +73,8 @@ src/
 ├── vba/          Nachbildung von VBA-/Excel-Verhalten (Trim, Like, CStr, Texterkennung)
 ├── xlsx/         XLSX lesen, Zellen formattreu ändern, neue Arbeitsmappen schreiben
 ├── main.ts       Oberfläche
-└── styles.css
+└── styles.css    Converter-Layout (Farben aus brand/)
+brand/            PRH Design Kit – gemeinsamer Stil, Logo und Favicon
 tests/
 ├── unit/         Tests für alle Regeln und Sonderfälle
 └── fixtures/     Beispiel-Exportdateien
