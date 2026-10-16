@@ -6,7 +6,7 @@ Gemeinsamer Stil für alle Projekte von Paul-Rafael Hasan-Man: elegant und zurü
 |---|---|
 | `brand.css` | Farben, Schrift und Bausteine (Klassen mit Präfix `pr-`) |
 | `logo.svg` | Signatur als Vektorgrafik, Farbe folgt dem Text (`currentColor`) |
-| `favicon.svg` | Logo-Kachel für den Browser-Tab |
+| `favicon.svg` | Signatur für den Browser-Tab (schwarz im hellen, weiß im dunklen Modus) |
 | `template.html` | Startvorlage für ein neues Projekt |
 | `preview.html` | Übersicht aller Farben und Bausteine (im Browser öffnen) |
 
