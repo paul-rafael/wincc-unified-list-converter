@@ -4,6 +4,7 @@ Gemeinsamer Stil für alle Projekte von Paul-Rafael Hasan-Man: elegant und zurü
 
 | Datei | Zweck |
 |---|---|
+| `DESIGN.md` | **Design-Richtlinie** – alle Regeln und Werte in einer Datei, zum Übertragen auf andere Projekte |
 | `brand.css` | Farben, Schrift und Bausteine (Klassen mit Präfix `pr-`) |
 | `logo.svg` | Signatur als Vektorgrafik, Farbe folgt dem Text (`currentColor`) |
 | `favicon.svg` | Signatur für den Browser-Tab (schwarz im hellen, weiß im dunklen Modus) |
