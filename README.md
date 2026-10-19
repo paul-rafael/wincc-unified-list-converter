@@ -101,6 +101,7 @@ Einmalig unter **Settings → Pages** als Quelle *Deploy from a branch* → `gh-
 
 - [Analyse & Regelwerk](docs/ANALYSE_UND_PLAN.md) – alle Umwandlungsregeln im Detail
 - [Abweichungen & Teststand](docs/ABWEICHUNGEN.md) – bekannte Unterschiede zum Excel-Original
+- [Changelog](CHANGELOG.md) – Versionshistorie
 
 ## Datenschutz
 
