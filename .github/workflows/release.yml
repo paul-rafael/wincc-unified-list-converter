@@ -3,6 +3,11 @@ name: Release
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Versions-Tag, z. B. v1.0.0 (wird auf dem gewählten Branch angelegt)'
+        required: true
 
 permissions:
   contents: write
@@ -10,6 +15,8 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
     steps:
       - uses: actions/checkout@v4
 
@@ -25,23 +32,24 @@ jobs:
       - name: Build-Archiv erstellen
         run: |
           cd dist
-          zip -r "../wincc-unified-list-converter-${GITHUB_REF_NAME}.zip" .
+          zip -r "../wincc-unified-list-converter-${TAG}.zip" .
 
       - name: Release-Notizen aus CHANGELOG lesen
         run: |
-          version="${GITHUB_REF_NAME#v}"
+          version="${TAG#v}"
           awk -v v="$version" '
             $0 ~ "^## \\[" v "\\]" { found=1; next }
             found && /^## \[/ { exit }
             found { print }
           ' CHANGELOG.md > release-notes.md
-          test -s release-notes.md || echo "Release ${GITHUB_REF_NAME}" > release-notes.md
+          test -s release-notes.md || echo "Release ${TAG}" > release-notes.md
 
       - name: GitHub-Release anlegen
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" \
-            "wincc-unified-list-converter-${GITHUB_REF_NAME}.zip" \
-            --title "$GITHUB_REF_NAME" \
+          gh release create "$TAG" \
+            "wincc-unified-list-converter-${TAG}.zip" \
+            --title "$TAG" \
+            --target "$GITHUB_SHA" \
             --notes-file release-notes.md
