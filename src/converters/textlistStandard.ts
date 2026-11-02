@@ -10,7 +10,7 @@
  */
 import { replaceNonAlnum } from '../vba/vba';
 import { Workbook } from '../xlsx/workbook';
-import { assertExtension, ConversionResult, NoticeLog, stemOf, where, writeText } from './common';
+import { assertExportKind, assertExtension, ConversionResult, NoticeLog, stemOf, where, writeText } from './common';
 
 const TARGETS: { sheet: string; col: number }[] = [
   { sheet: 'TextList', col: 1 },
@@ -92,6 +92,7 @@ export function standardOutputName(fileName: string): string {
 export async function convertTextlistStandard(input: ArrayBuffer | Uint8Array, fileName: string): Promise<ConversionResult> {
   assertExtension(fileName, ['.xlsx', '.xlsm']);
   const wb = await Workbook.load(input);
+  await assertExportKind(wb, 'textlist');
   const log = new NoticeLog();
   const parts: string[] = [];
 

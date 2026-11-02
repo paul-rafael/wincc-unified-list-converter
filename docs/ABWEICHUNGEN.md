@@ -7,8 +7,8 @@ Referenz: `Unified_Migration_Tool.xlsm` (VBA-Module 1, 2, 3, 7, 8 + Hilfsfunktio
 | Original-Button | Webversion | Portiert aus |
 |---|---|---|
 | HMI TagList Konverter (ALT) | **HMI-Variablen** | `Modul1.SonderzeichenMitKnopf` |
-| HMI TextList Konverter (alt) | **Textlisten · Klassisch** | `Modul2.Clean_TextList_Sheet` |
-| HMI TextList Konverter (neu) | **Textlisten · Aktuell** | `Modul3.ReplaceSpecialCharsInWorkbook` |
+| HMI TextList Konverter (alt) | **Textlisten** (älteres Exportformat, ohne Spalte `FieldInfos`) | `Modul2.Clean_TextList_Sheet` |
+| HMI TextList Konverter (neu) | **Textlisten** (aktuelles Exportformat, mit Spalte `FieldInfos`) | `Modul3.ReplaceSpecialCharsInWorkbook` |
 | HMI-Alarm Konverter | **HMI-Meldungen** | `Modul8.ConvertAlarmList_Unified` (+ `ExtractRefs`, `ExtractTagByRef`, `ExtractLengthByRef`) |
 | AZU | **Meldetexte umbrechen** | `Modul7.FormatHMITextInFile` / `FormatHMITextWithErrorCode` – im Original war der Button versehentlich mit Modul1 verknüpft |
 
@@ -21,10 +21,10 @@ Nicht portiert (kein Button, unvollständig): `Excel_Bereinigen` (Modul4/5), `Co
 | `.xls` | Dateifilter erlaubt `.xls` (Modul3, Modul8) | wird mit Hinweis abgelehnt | Binärformat; TIA Portal exportiert `.xlsx` |
 | Fehlerwerte (`#NV` …) in zu lesenden Zellen | Laufzeitfehler 13, Abbruch | Abbruch mit Meldung inkl. Zelle | gleiche Wirkung, verständlichere Meldung |
 | Fehlendes Trennzeichen in FieldInfo / `ref="` | Laufzeitfehler 5, Abbruch | Abbruch mit Meldung | dito |
-| Blattschutz (HMI-Variablen, Textlisten · Klassisch, Meldetexte umbrechen) | Laufzeitfehler 1004 | Abbruch mit Meldung | dito |
-| Blattschutz (Textlisten · Aktuell) | Fehlerhandler meldet „Blatt nicht gefunden“ und macht weiter | Hinweis „schreibgeschützt, übersprungen“ und weiter | gleiche Wirkung, korrekte Meldung |
+| Blattschutz (HMI-Variablen, Textlisten (älteres Format), Meldetexte umbrechen) | Laufzeitfehler 1004 | Abbruch mit Meldung | dito |
+| Blattschutz (Textlisten (aktuelles Format)) | Fehlerhandler meldet „Blatt nicht gefunden“ und macht weiter | Hinweis „schreibgeschützt, übersprungen“ und weiter | gleiche Wirkung, korrekte Meldung |
 | Gemeinsame Formeln/Matrixformeln in Zielzellen | werden überschrieben | Abbruch mit Meldung | würde die Datei ohne Excel-Neuberechnung beschädigen |
-| `.xlsm` bei Textlisten · Klassisch | Speichern-Vorschlag `Name.xlsm` als `.xlsx`-Format | `Name_MIGUNI.xlsx` | Original-Vorschlag führt zu Formatkonflikt |
+| `.xlsm` bei Textlisten (älteres Format) | Speichern-Vorschlag `Name.xlsm` als `.xlsx`-Format | `Name_MIGUNI.xlsx` | Original-Vorschlag führt zu Formatkonflikt |
 | Abbruch-/Speicherdialoge | Excel-Dialoge | Download-Schaltfläche | nur Oberfläche |
 | Meldetexte umbrechen: Speichern | Makro speichert nicht, Mappe bleibt offen | Download unter gleichem Namen und Format (`.xlsm` bleibt mit Makros erhalten) | entspricht „Speichern“ durch den Benutzer |
 | Meldetexte umbrechen: `Rows.AutoFit` | Excel berechnet die Höhe sofort | gespeicherte Zeilenhöhe wird entfernt, Excel berechnet sie beim Öffnen | Höhe hängt von Schrift/Spaltenbreite ab; in Excel geprüft |
@@ -35,11 +35,13 @@ Excel interpretiert Text, der per VBA in eine Zelle geschrieben wird (`Range.Val
 
 - **Umgesetzt:** reine Zahlen (`123`, `007`, `1E5`, `1.5`) werden zu Zahlen – außer in Zellen mit Textformat (`@`). Leerer Text erzeugt eine leere Zelle.
 - **Als Text belassen und als Hinweis gemeldet:** Text mit `=` am Anfang, Prozentwerte, Zahlen mit Komma, Datums-/Uhrzeit-Muster, `(5)`, `TRUE/FALSE/WAHR/FALSCH`.
-- **Textlisten · Klassisch:** Zellen mit Kommazahlen, Datumswerten oder Wahrheitswerten werden nicht verändert (Hinweis), weil `CStr` + Rückschreiben in deutschem Excel gebietsschemaabhängig ist.
+- **Textlisten (älteres Format):** Zellen mit Kommazahlen, Datumswerten oder Wahrheitswerten werden nicht verändert (Hinweis), weil `CStr` + Rückschreiben in deutschem Excel gebietsschemaabhängig ist.
 - **HMI-Variablen:** Zahlen/Datumswerte in Spalte A werden wie `CStr` in de-DE umgewandelt (`1,5` → `1_5`, Datum → `01_05_2025`), Wahrheitswerte als `Wahr`/`Falsch` (Hinweis).
 - **HMI-Meldungen:** Datumswerte in A–G werden als Zahl übernommen (Excel würde ein Datumsformat setzen; Hinweis).
-- **Textlisten · Aktuell – Erweiterung:** Über das Makro hinaus wird die Spalte `FieldInfos` ins Unified-Format umgewandelt (Textlisten-Felder: Länge 5, rechtsbündig; Text-Felder: Länge = Anzahl `?` im DisplayFormat, linksbündig). Abgeglichen mit einem echten Unified-Export: 94 von 96 Feldern identisch; die zwei Abweichungen stammen von einer Textliste, die im Zielprojekt von Hand auf Länge 20/linksbündig gestellt war.
-- **Textlisten · Aktuell:** Formel- und Fehlerzellen werden nicht verändert (Hinweis); Zahlen bleiben unverändert (in deutschem Excel enthält der Formeltext einer Zahl kein `.`).
+- **Textlisten – eine Funktion statt zwei:** Die beiden Makro-Buttons sind zu einer Funktion zusammengelegt. Welche Regel greift, entscheidet die Spalte `FieldInfos` in `TextListEntry`: vorhanden → Namen bereinigen und FieldInfos umwandeln (Feldverweise bleiben erhalten); nicht vorhanden → klassische Bereinigung des Makros. Steht `FieldInfos` innerhalb von E–J, bricht die klassische Bereinigung ab, statt die Spalte zu überschreiben.
+- **Falsche Datei:** Ist eine Datei erkennbar ein anderer Export (Textlisten, Meldungen, Variablen) als die gewählte Funktion erwartet, bricht der Converter mit einem Hinweis auf die richtige Funktion ab. Die Makros haben solche Dateien ohne Warnung verarbeitet.
+- **Textlisten (aktuelles Format) – Erweiterung:** Über das Makro hinaus wird die Spalte `FieldInfos` ins Unified-Format umgewandelt (Textlisten-Felder: Länge 5, rechtsbündig; Text-Felder: Länge = Anzahl `?` im DisplayFormat, linksbündig). Abgeglichen mit einem echten Unified-Export: 94 von 96 Feldern identisch; die zwei Abweichungen stammen von einer Textliste, die im Zielprojekt von Hand auf Länge 20/linksbündig gestellt war.
+- **Textlisten (aktuelles Format):** Formel- und Fehlerzellen werden nicht verändert (Hinweis); Zahlen bleiben unverändert (in deutschem Excel enthält der Formeltext einer Zahl kein `.`).
 
 ## Technische Unterschiede ohne fachliche Auswirkung
 
@@ -52,7 +54,7 @@ Excel interpretiert Text, der per VBA in eine Zelle geschrieben wird (`Range.Val
 
 - 35 automatisierte Tests (`npm test`) für alle Regeln und Sonderfälle aus der VBA-Analyse – bestanden.
 - Beispieldateien, die unabhängig mit openpyxl erzeugt wurden (`tests/fixtures`), wurden konvertiert; die Ergebnisse wurden mit openpyxl gelesen und in **Microsoft Excel für Mac** ohne Reparaturmeldung geöffnet (bei *Meldetexte umbrechen* inkl. Prüfung von Zeilenumbruch und automatischer Zeilenhöhe).
-- Alle fünf Funktionen im Browser getestet (Auswahl, Drag & Drop, Konvertierung, Download, Fehlermeldung bei falschem Dateityp, Handy-Breite).
+- Alle Funktionen im Browser getestet (Auswahl, Drag & Drop, Konvertierung, Download, Fehlermeldung bei falschem Dateityp, Handy-Breite).
 
 ## Noch offen
 

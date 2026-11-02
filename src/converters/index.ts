@@ -2,8 +2,7 @@ import { convertAlarms } from './alarms';
 import { convertLineBreaks } from './lineBreaks';
 import type { ConversionResult, ConverterId } from './common';
 import { convertTags } from './tags';
-import { convertTextlistLegacy } from './textlistLegacy';
-import { convertTextlistStandard } from './textlistStandard';
+import { convertTextlists } from './textlists';
 
 export type { ConversionResult, ConverterId, Notice } from './common';
 
@@ -27,20 +26,12 @@ export const CONVERTERS: ConverterDef[] = [
     run: convertTags,
   },
   {
-    id: 'textlistLegacy',
-    title: 'Textlisten · Klassisch',
-    subtitle: 'Platzhalter bereinigen, leere Sprachen füllen',
-    legacyName: 'HMI TextList Konverter (alt)',
-    accept: ['.xlsx', '.xlsm'],
-    run: convertTextlistLegacy,
-  },
-  {
-    id: 'textlistStandard',
-    title: 'Textlisten · Aktuell',
+    id: 'textlists',
+    title: 'Textlisten',
     subtitle: 'Namen bereinigen, FieldInfos ins Unified-Format',
-    legacyName: 'HMI TextList Konverter (neu)',
+    legacyName: 'HMI TextList Konverter (alt) und (neu)',
     accept: ['.xlsx', '.xlsm'],
-    run: convertTextlistStandard,
+    run: convertTextlists,
   },
   {
     id: 'alarms',

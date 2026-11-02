@@ -4,6 +4,21 @@ Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Das Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 die Versionierung folgt [Semantic Versioning](https://semver.org/lang/de/).
 
+## [Unreleased]
+
+### Geändert
+
+- **Textlisten · Klassisch** und **Textlisten · Aktuell** sind zu einer Funktion **Textlisten** zusammengelegt.
+  Sie erkennt am Exportformat selbst, was zu tun ist: Mit Spalte `FieldInfos` werden Namen bereinigt und die
+  FieldInfos ins Unified-Format umgewandelt, ohne diese Spalte läuft die klassische Platzhalter-Bereinigung.
+
+### Behoben
+
+- Die klassische Bereinigung hat bei Exporten mit weniger als sechs Sprachen die Spalte `FieldInfos` überschrieben.
+  Sie bricht jetzt mit einer Erklärung ab.
+- Wird für eine Datei die falsche Funktion gewählt (z. B. eine Textliste bei „HMI-Meldungen“), meldet der Converter
+  das und nennt die passende Funktion, statt ein unbrauchbares Ergebnis zu erzeugen.
+
 ## [1.1.0] - 2026-11-02
 
 ### Neu

@@ -17,6 +17,8 @@ import {
   replaceSpecialChars,
   standardOutputName,
 } from '../../src/converters/textlistStandard';
+import { convertTextlists } from '../../src/converters/textlists';
+import { convertAlarms as convertAlarmsForKind } from '../../src/converters/alarms';
 import { empty, makeXlsx, num, readSheet, str } from '../helpers';
 
 const DASH = '—';
@@ -373,5 +375,59 @@ describe('Meldetexte umbrechen (FormatHMITextWithErrorCode)', () => {
     const sheet = await zip.file('xl/worksheets/sheet1.xml')!.async('string');
     expect(sheet).toMatch(/<c r="C2"(?=[^>]*s="4")[^>]*>/);
     expect(sheet).toMatch(/<c r="C3"(?=[^>]*s="5")[^>]*>/);
+  });
+});
+
+describe('Textlisten (automatische Erkennung) und Schutz vor falschen Dateien', () => {
+  const entryHeader = { A: 'Name', B: 'Parent', C: 'DefaultEntry', D: 'Value', E: 'Text [de-DE]' };
+
+  it('uses the Unified conversion when a FieldInfos column exists, wherever it is', async () => {
+    const input = await makeXlsx([
+      { name: 'TextList', rows: { 1: { A: 'Name' }, 2: { A: 'L.1' } } },
+      {
+        name: 'TextListEntry',
+        rows: {
+          1: { ...entryHeader, F: 'FieldInfos' },
+          2: { A: 'e', B: 'L.1', E: '<field ref="0" />', F: '<ref id = 0; type = CommonTextList; TextList = X; Tag = "A.B"; Length = 79;>\n' },
+        },
+      },
+    ]);
+    const res = await convertTextlists(input, 'Lib.xlsx');
+    expect(res.fileName).toBe('Lib.xlsx');
+    const tle = await readSheet(res.data, 'TextListEntry');
+    // the field reference survives, nothing is written into the empty language columns
+    expect(tle(2, 'E')).toEqual(str('<field ref="0" />'));
+    expect(JSON.stringify(tle(2, 'F'))).toContain('ILCommonTagDisplayFormatWithTextList');
+    expect(tle(2, 'G')).toEqual(empty);
+    expect(tle(2, 'B')).toEqual(str('L_1'));
+  });
+
+  it('uses the classic cleanup for exports without FieldInfos', async () => {
+    const input = await makeXlsx([
+      { name: 'TextList', rows: { 1: { A: 'Name' }, 2: { A: 'L' } } },
+      { name: 'TextListEntry', rows: { 1: entryHeader, 2: { A: 'e', B: 'L', E: '<No value>' } } },
+    ]);
+    const res = await convertTextlists(input, 'Old.xlsx');
+    expect(res.fileName).toBe('Old_MIGUNI.xlsx');
+    expect((await readSheet(res.data, 'TextListEntry'))(2, 'E')).toEqual(str(DASH));
+  });
+
+  it('refuses the classic cleanup when it would overwrite FieldInfos', async () => {
+    const input = await makeXlsx([{ name: 'TextListEntry', rows: { 1: { ...entryHeader, F: 'FieldInfos' }, 2: { E: '<No value>' } } }]);
+    await expect(convertTextlistLegacy(input, 'a.xlsx')).rejects.toThrow(/1 Sprachspalte.*FieldInfos.*in F/);
+  });
+
+  it('names the right function when a file of another kind is chosen', async () => {
+    const textlist = await makeXlsx([
+      { name: 'TextList', rows: { 1: { A: 'Name' } } },
+      { name: 'TextListEntry', rows: { 1: entryHeader } },
+    ]);
+    await expect(convertAlarmsForKind(textlist, 'T.xlsx')).rejects.toThrow(/Textlisten-Export.*„Textlisten“/);
+    await expect(convertTags(textlist, 'T.xlsx')).rejects.toThrow(/Textlisten-Export/);
+    const alarms = await makeXlsx([{ name: 'DiscreteAlarms', rows: { 1: { A: 'ID', B: 'Name', C: 'Alarm text [de-DE], Alarm text' } } }]);
+    await expect(convertTextlists(alarms, 'A.xlsx')).rejects.toThrow(/Meldungs-Export/);
+    await expect(convertTags(alarms, 'A.xlsx')).rejects.toThrow(/Meldungs-Export/);
+    const tags = await makeXlsx([{ name: 'Hmi Tags', rows: { 1: { A: 'Name', B: 'Path', C: 'Connection', D: 'PLC tag', E: 'DataType' } } }]);
+    await expect(convertAlarmsForKind(tags, 'H.xlsx')).rejects.toThrow(/Variablen-Export.*„HMI-Variablen“/);
   });
 });

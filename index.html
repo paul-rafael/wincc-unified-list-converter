@@ -172,55 +172,35 @@
           </div>
         </article>
 
-        <article class="guide-panel" data-guide="textlistLegacy" hidden>
+        <article class="guide-panel" data-guide="textlists" hidden>
           <div class="guide-grid">
             <div>
               <h3>Wofür?</h3>
-              <p>Für Textlisten <strong>älterer Panel-Projekte</strong>, deren Export Platzhalter wie <code>&lt;No value&gt;</code> oder <code>&lt;field ref="0" /&gt;</code> enthält. Ungültige Objekte werden entfernt, leere Sprachvarianten werden befüllt. Der Text der Hauptsprache (Spalte E) bleibt unberührt.</p>
+              <p>Für die <strong>Textlisten</strong> eines Panel-Projekts. Der Converter erkennt am Aufbau der Exportdatei selbst, welche Umwandlung passt – du musst nichts auswählen.</p>
+              <p><strong>Aktuelles Exportformat</strong> (Blatt <code>TextListEntry</code> mit einer Spalte <code>FieldInfos</code>): Die Namen werden in eine von Unified akzeptierte Schreibweise gebracht und die Feldverweise ins Unified-Format umgewandelt – so wie in einem Textlisten-Export aus Unified.</p>
+              <p><strong>Älteres Exportformat</strong> (ohne Spalte <code>FieldInfos</code>): Platzhalter wie <code>&lt;No value&gt;</code> oder <code>&lt;field ref="0" /&gt;</code> werden durch feste Texte ersetzt und leere Sprachvarianten befüllt.</p>
               <h3>So gehst du vor</h3>
               <ol class="steps">
                 <li>Die Textlisten im alten Projekt exportieren.</li>
-                <li>Oben <em>Textlisten · Klassisch</em> wählen, Datei hochladen und konvertieren.</li>
-                <li>Mit der Ergebnisdatei wie bei den HMI-Variablen verfahren: sortieren und die bereinigten Einträge übernehmen.</li>
+                <li>Oben <em>Textlisten</em> wählen, Datei hochladen und konvertieren. Die Zusammenfassung zeigt, welches Format erkannt wurde.</li>
+                <li>Die Ergebnisdatei ins Unified-Projekt importieren.</li>
               </ol>
             </div>
             <aside class="rules">
-              <h4>Was genau geändert wird</h4>
+              <h4>Aktuelles Exportformat</h4>
               <ul>
-                <li>Blatt <code>TextListEntry</code>, Spalten E–J, ab Zeile 2.</li>
-                <li><code>&lt;No value&gt;</code> → Text aus Spalte I bzw. TextList-Name aus Spalte K, sonst <code>—</code>.</li>
-                <li><code>&lt;field ref="0" /&gt;</code> → TextList-Name aus Spalte K, sonst <code>—</code>.</li>
-                <li>Andere <code>&lt;…&gt;</code>-Tags werden entfernt, doppelte Leerzeichen zusammengefasst. Leere Zellen in F–J werden zu <code>—</code>.</li>
-                <li>Spalte E wird nur bei <code>&lt;No value&gt;</code> oder <code>&lt;field ref="0" /&gt;</code> angepasst.</li>
-                <li>Eingabe: <code>.xlsx</code>, <code>.xlsm</code> · Ergebnis: <code>&lt;Name&gt;_MIGUNI.xlsx</code></li>
+                <li><code>TextList</code> Spalte A und <code>TextListEntry</code> Spalte B ab Zeile 2: <code>#</code>, <code>/</code>, <code>.</code> → <code>_</code>; <code>[</code> → <code>(</code>, <code>]</code> → <code>)</code>.</li>
+                <li><code>FieldInfos</code>: <code>CommonTextList</code> → <code>ILCommonTagDisplayFormatWithTextList</code> (Länge 5, rechtsbündig), <code>CommonTagDisplayFormat</code> mit <code>????</code> → <code>ILCommonTagDisplayFormat</code> (Länge = Anzahl <code>?</code>, linksbündig).</li>
+                <li>Variablennamen verlieren Anführungszeichen; <code>\</code>, <code>.</code> und andere Sonderzeichen werden zu <code>_</code> – passend zur Funktion <em>HMI-Variablen</em>.</li>
+                <li>Ergebnis: gleicher Dateiname als <code>.xlsx</code></li>
               </ul>
-            </aside>
-          </div>
-        </article>
-
-        <article class="guide-panel" data-guide="textlistStandard" hidden>
-          <div class="guide-grid">
-            <div>
-              <h3>Wofür?</h3>
-              <p>Für Textlisten <strong>neuerer Panel-Projekte</strong>, deren Texte bereits sauber sind. Die Namen der Textlisten und Einträge werden in eine von Unified akzeptierte Schreibweise gebracht, und die Feldverweise (<code>FieldInfos</code>) werden in das Unified-Format umgewandelt – so wie in einem Textlisten-Export aus Unified.</p>
-              <h3>So gehst du vor</h3>
-              <ol class="steps">
-                <li>Die Textlisten im alten Projekt exportieren.</li>
-                <li>Oben <em>Textlisten · Aktuell</em> wählen, Datei hochladen und konvertieren.</li>
-                <li>Die Ergebnisdatei wieder importieren bzw. die Namen wie bei den HMI-Variablen übernehmen.</li>
-              </ol>
-            </div>
-            <aside class="rules">
-              <h4>Was genau geändert wird</h4>
+              <h4>Älteres Exportformat</h4>
               <ul>
-                <li>Blatt <code>TextList</code> Spalte A und Blatt <code>TextListEntry</code> Spalte B, jeweils ab Zeile 2.</li>
-                <li><code>#</code>, <code>/</code> und <code>.</code> werden zu <code>_</code>; <code>[</code> wird zu <code>(</code>, <code>]</code> zu <code>)</code>.</li>
-                <li>Spalte <code>FieldInfos</code> in <code>TextListEntry</code>: <code>CommonTextList</code> wird zu <code>ILCommonTagDisplayFormatWithTextList</code> (Länge 5, rechtsbündig), <code>CommonTagDisplayFormat</code> mit Text-Format <code>????</code> zu <code>ILCommonTagDisplayFormat</code> (Länge = Anzahl <code>?</code>, linksbündig).</li>
-                <li>Variablennamen in den FieldInfos verlieren Anführungszeichen; <code>\</code>, <code>.</code> und alle anderen Sonderzeichen werden zu <code>_</code> – passend zur Funktion <em>HMI-Variablen</em>.</li>
-                <li>Bereits umgewandelte FieldInfos bleiben unverändert, unbekannte Formate werden als Hinweis gemeldet.</li>
-                <li>Fehlt eines der Blätter, wird es mit Hinweis übersprungen.</li>
-                <li>Eingabe: <code>.xlsx</code>, <code>.xlsm</code> · Ergebnis: gleicher Dateiname als <code>.xlsx</code></li>
+                <li><code>TextListEntry</code>, Spalten E–J ab Zeile 2: <code>&lt;No value&gt;</code> → Text aus Spalte I bzw. TextList-Name aus Spalte K, sonst <code>—</code>; <code>&lt;field ref="0" /&gt;</code> → TextList-Name, sonst <code>—</code>.</li>
+                <li>Andere <code>&lt;…&gt;</code>-Tags werden entfernt, leere Zellen in F–J werden zu <code>—</code>.</li>
+                <li>Ergebnis: <code>&lt;Name&gt;_MIGUNI.xlsx</code></li>
               </ul>
+              <p>Eingabe: <code>.xlsx</code>, <code>.xlsm</code></p>
             </aside>
           </div>
         </article>

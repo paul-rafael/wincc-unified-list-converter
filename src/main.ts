@@ -3,8 +3,7 @@ import { ConversionError } from './errors';
 
 const ICONS: Record<string, string> = {
   tags: '<path d="M4 7h16M4 12h10M4 17h7"/><path d="m15 15 2 2 4-4"/>',
-  textlistLegacy: '<rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h5"/><path d="M8 17h2"/>',
-  textlistStandard: '<path d="M8 6h12M8 12h12M8 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/>',
+  textlists: '<path d="M8 6h12M8 12h12M8 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01"/>',
   alarms: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
   lineBreaks: '<path d="M4 6h16M4 12h13a3 3 0 0 1 0 6h-4"/><path d="m15 16-2 2 2 2"/><path d="M4 18h5"/>',
 };
