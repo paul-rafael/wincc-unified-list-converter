@@ -4,6 +4,20 @@ Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Das Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 die Versionierung folgt [Semantic Versioning](https://semver.org/lang/de/).
 
+## [1.4.0] - 2026-11-02
+
+### Neu
+
+- **Variablen-Ereignisse vollautomatisch aus dem Openness-Export:** ZIP (manifest.json + Tags/*.xml) oder einzelne
+  Variablen-XML hochladen – das Skript erscheint direkt auf der Seite und lässt sich mit **Skript kopieren** übernehmen.
+  - Alle Ereignisse pro Variable (Wertänderung, Überschreitung, Unterschreitung) mit ihren kompletten Funktionslisten.
+  - Umgesetzt: SetTag, LinearScaling, InvertLinearScaling, SetBit, ResetBit, InvertBit, IncreaseValue, DecreaseValue,
+    ActivateScreen, ActivateScreenByNumber (mit Bildnummern-Tabelle); andere Funktionen als `// TODO` mit Hinweis.
+  - Verhalten wie in Advanced: Funktionslisten laufen nur beim Ereignis; Grenzwerte kommen aus der Variable.
+    Nach dem Start werden Berechnungen einmal ausgeführt, Bildwechsel nicht.
+  - Innerhalb einer Funktionsliste wird ein gerade berechneter Wert direkt weiterverwendet, statt ihn zurückzulesen.
+  - Variablennamen werden wie bei „HMI-Variablen“ ins Unified-Format übersetzt und gegen den Export geprüft.
+
 ## [1.3.0] - 2026-11-02
 
 ### Neu
@@ -77,6 +91,7 @@ Unified Migration Tools, die vollständig im Browser läuft.
 - Responsives Design im hellen und dunklen Modus (PRH Design Kit)
 - Automatisierte Tests für alle Umwandlungsregeln
 
+[1.4.0]: https://github.com/paul-rafael/wincc-unified-list-converter/releases/tag/v1.4.0
 [1.3.0]: https://github.com/paul-rafael/wincc-unified-list-converter/releases/tag/v1.3.0
 [1.2.0]: https://github.com/paul-rafael/wincc-unified-list-converter/releases/tag/v1.2.0
 [1.1.0]: https://github.com/paul-rafael/wincc-unified-list-converter/releases/tag/v1.1.0

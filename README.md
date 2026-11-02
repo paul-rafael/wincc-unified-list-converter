@@ -23,7 +23,7 @@ Bei der Migration eines WinCC-Projekts auf Unified Panels müssen HMI-Variablen,
 | | Funktion | Was sie macht | Eingabe | Ergebnis |
 |---|---|---|---|---|
 | 1 | **HMI-Variablen** | Ersetzt alle Sonderzeichen in Variablennamen durch `_` | `.xlsx` | `HMITagList_MIGUNI.xlsx` |
-| 2 | **Variablen-Ereignisse** | Erzeugt aus dem HMI-Variablen-Export eine Vorlage für die Ereignisse (Wertänderung, Über-/Unterschreitung) und aus der ausgefüllten Vorlage das Skript `TagEvent.js` für WinCC Unified | `.xlsx` | `TagEvents.xlsx` bzw. `TagEvent.js` |
+| 2 | **Variablen-Ereignisse** | Liest die Variablen-Ereignisse (Wertänderung, Über-/Unterschreitung) mit ihren Funktionslisten aus dem TIA-Openness-Export und erzeugt das fertige Unified-Skript zum Kopieren. Ohne Openness: Vorlage aus dem Excel-Export | `.zip` `.xml` `.xlsx` | `TagEvent.js` |
 | 3 | **Textlisten** | Erkennt das Exportformat selbst: aktuelle Exporte (mit `FieldInfos`) – Namen bereinigen (`# / .` und `[ ]`), FieldInfos ins Unified-Format; ältere Exporte – Platzhalter (`<No value>`, `<field ref="0" />`) bereinigen, leere Sprachen füllen | `.xlsx` `.xlsm` | `<Name>.xlsx` bzw. `<Name>_MIGUNI.xlsx` |
 | 4 | **HMI-Meldungen** | Erzeugt die Unified-Alarmliste `DiscreteAlarms` (44 Spalten) inkl. neuer FieldInfo | `.xlsx` `.xlsm` | `Unified_HMI-Alarms.xlsx` |
 | 5 | **Meldetexte umbrechen** | Teilt Meldetexte in Fehlercode und Zeilen à max. 80 Zeichen (`¶`) | `.xlsx` `.xlsm` | gleicher Dateiname |

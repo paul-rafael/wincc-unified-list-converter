@@ -29,9 +29,9 @@ export const CONVERTERS: ConverterDef[] = [
   {
     id: 'tagEvents',
     title: 'Variablen-Ereignisse',
-    subtitle: 'Ereignis-Skript für Unified erzeugen',
+    subtitle: 'Ereignis-Skript aus dem Openness-Export',
     legacyName: 'neu, ohne Vorbild im Excel-Tool',
-    accept: ['.xlsx'],
+    accept: ['.zip', '.xml', '.xlsx'],
     run: convertTagEvents,
   },
   {

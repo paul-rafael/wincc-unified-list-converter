@@ -12,6 +12,8 @@ export interface Notice {
 export interface ConversionResult {
   data: Uint8Array;
   fileName: string;
+  /** Text results (scripts) are also shown on the page to copy them. */
+  text?: string;
   notices: Notice[];
   summary: string;
 }

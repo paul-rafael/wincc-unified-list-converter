@@ -12,7 +12,7 @@ Referenz: `Unified_Migration_Tool.xlsm` (VBA-Module 1, 2, 3, 7, 8 + Hilfsfunktio
 | HMI-Alarm Konverter | **HMI-Meldungen** | `Modul8.ConvertAlarmList_Unified` (+ `ExtractRefs`, `ExtractTagByRef`, `ExtractLengthByRef`) |
 | AZU | **Meldetexte umbrechen** | `Modul7.FormatHMITextInFile` / `FormatHMITextWithErrorCode` – im Original war der Button versehentlich mit Modul1 verknüpft |
 
-Neu ohne Vorbild im Excel-Tool: **Variablen-Ereignisse** (`src/converters/tagEvents.ts`) – erzeugt aus einer Ereignis-Tabelle ein Unified-Skript als Ersatz für Advanced-Variablenereignisse.
+Neu ohne Vorbild im Excel-Tool: **Variablen-Ereignisse** (`src/converters/tagEvents.ts`) – erzeugt aus dem TIA-Openness-Export (`src/converters/tagEventsXml.ts`) oder einer Ereignis-Tabelle ein Unified-Skript als Ersatz für Advanced-Variablenereignisse. Abgeglichen mit einem echten Export (790 Variablen, 56 Ereignisse, 178 Funktionsaufrufe, alle automatisch umgesetzt).
 
 Nicht portiert (kein Button, unvollständig): `Excel_Bereinigen` (Modul4/5), `ConvertAlarmLists2` (Modul9–11).
 
