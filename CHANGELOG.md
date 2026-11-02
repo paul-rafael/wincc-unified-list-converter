@@ -4,10 +4,19 @@ Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Das Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 die Versionierung folgt [Semantic Versioning](https://semver.org/lang/de/).
 
-## [Unreleased]
+## [1.2.0] - 2026-11-02
 
 ### Geändert
 
+- **Oberfläche verfeinert** (gleicher Aufbau, gleiche Farben):
+  - Funktionskarten breiter und besser lesbar, ausgewählte Karte mit roter Tönung, Rahmen und Häkchen.
+  - Upload mit klaren Zuständen: Ziehen, geladen (Name, Typ, Größe), ungültig (Meldung direkt am Upload-Bereich),
+    Datei ersetzen oder entfernen.
+  - Konvertieren-Button mit Symbol und eindeutigem Lade- und Gesperrt-Zustand.
+  - Ergebnisbereich mit Ergebnisdatei, Anzahl der Hinweise und Download.
+  - Anleitung mit besser lesbaren Tabs, einheitlichen Tastenkappen und klar abgesetztem Regelkasten.
+  - Sichtbare Tastatur-Fokusrahmen, keine Schrift unter 12 px, geprüft bei 1440, 1024, 768 und 390 px Breite.
+- Der Release-Workflow veröffentlicht die Webseite jetzt automatisch mit, damit Release und Live-Seite nicht auseinanderlaufen.
 - **Textlisten · Klassisch** und **Textlisten · Aktuell** sind zu einer Funktion **Textlisten** zusammengelegt.
   Sie erkennt am Exportformat selbst, was zu tun ist: Mit Spalte `FieldInfos` werden Namen bereinigt und die
   FieldInfos ins Unified-Format umgewandelt, ohne diese Spalte läuft die klassische Platzhalter-Bereinigung.
@@ -54,5 +63,6 @@ Unified Migration Tools, die vollständig im Browser läuft.
 - Responsives Design im hellen und dunklen Modus (PRH Design Kit)
 - Automatisierte Tests für alle Umwandlungsregeln
 
+[1.2.0]: https://github.com/paul-rafael/wincc-unified-list-converter/releases/tag/v1.2.0
 [1.1.0]: https://github.com/paul-rafael/wincc-unified-list-converter/releases/tag/v1.1.0
 [1.0.0]: https://github.com/paul-rafael/wincc-unified-list-converter/releases/tag/v1.0.0
