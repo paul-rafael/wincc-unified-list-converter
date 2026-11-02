@@ -53,3 +53,15 @@ jobs:
             --title "$TAG" \
             --target "$GITHUB_SHA" \
             --notes-file release-notes.md
+
+      - name: Webseite veröffentlichen (Branch gh-pages)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd dist
+          touch .nojekyll
+          git init -q -b gh-pages
+          git add -A
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "Deploy $TAG"
+          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages

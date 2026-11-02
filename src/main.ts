@@ -20,6 +20,8 @@ const statusEl = $('status');
 const resultEl = $('result');
 const errorEl = $('error');
 const downloadEl = $<HTMLAnchorElement>('download');
+const fileErrorEl = $('file-error');
+const actionsEl = convertBtn.closest<HTMLElement>('.actions')!;
 
 let selected: ConverterDef = CONVERTERS[0];
 let file: File | null = null;
@@ -70,10 +72,20 @@ function showGuide(id: string): void {
   for (const p of Array.from(document.querySelectorAll<HTMLElement>('[data-guide]'))) p.hidden = p.dataset.guide !== id;
 }
 
+function renderFormats(): void {
+  const list = $('formats');
+  list.innerHTML = '';
+  for (const c of CONVERTERS) {
+    const li = document.createElement('li');
+    li.innerHTML = `<span>${c.title}</span><span>${c.accept.map((a) => `<code>${a}</code>`).join(' ')}</span>`;
+    list.appendChild(li);
+  }
+}
+
 function select(id: string): void {
   selected = CONVERTERS.find((c) => c.id === id) ?? CONVERTERS[0];
   fileInput.accept = selected.accept.join(',');
-  $('accept-hint').textContent = `Unterstützt: ${selected.accept.join(', ')}`;
+  $('accept-hint').textContent = `Unterstützte Formate: ${selected.accept.join(', ')}`;
   showGuide(selected.id);
   clearOutcome();
   validateFile();
@@ -90,37 +102,54 @@ function setFile(f: File | null): void {
   clearOutcome();
   if (f) {
     $('file-name').textContent = f.name;
+    $('file-name').title = f.name;
     $('file-size').textContent = formatSize(f.size);
+    const ext = extensionOf(f.name);
+    $('file-type').textContent = ext ? ext.slice(1) : 'ohne Endung';
   }
   fileRow.hidden = !f;
   dropzone.hidden = !!f;
   validateFile();
 }
 
+function extensionOf(name: string): string {
+  const i = name.lastIndexOf('.');
+  return i < 0 ? '' : name.slice(i).toLowerCase();
+}
+
+function setFileError(text: string | null): void {
+  fileRow.classList.toggle('is-invalid', !!text);
+  fileErrorEl.hidden = !text;
+  $('file-error-text').textContent = text ?? '';
+}
+
 function validateFile(): void {
   if (!file) {
     convertBtn.disabled = true;
+    setFileError(null);
+    setStatus('Wähle zuerst eine Datei aus.');
+    return;
+  }
+  const ext = extensionOf(file.name);
+  if (!selected.accept.includes(ext)) {
+    convertBtn.disabled = true;
+    const formats = selected.accept.join(' oder ');
+    setFileError(
+      ext === '.xls'
+        ? `Alte .xls-Dateien werden nicht unterstützt. Bitte die Datei in Excel als .xlsx speichern. „${selected.title}“ erwartet ${formats}.`
+        : `Dateityp „${ext || 'ohne Endung'}“ wird nicht unterstützt. „${selected.title}“ erwartet ${formats}.`,
+    );
     setStatus('');
     return;
   }
-  const ext = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
-  if (!selected.accept.includes(ext)) {
-    convertBtn.disabled = true;
-    setStatus(
-      ext === '.xls'
-        ? 'Alte .xls-Dateien werden nicht unterstützt – bitte in Excel als .xlsx speichern.'
-        : `„${selected.title}“ erwartet ${selected.accept.join(' oder ')}.`,
-      'warn',
-    );
-    return;
-  }
+  setFileError(null);
   convertBtn.disabled = busy;
   setStatus('Bereit zum Konvertieren.');
 }
 
 function setTypesDisabled(disabled: boolean): void {
   for (const i of Array.from(typesEl.querySelectorAll('input'))) i.disabled = disabled;
-  fileRow.querySelector('button')!.disabled = disabled;
+  for (const b of Array.from(fileRow.querySelectorAll('button'))) b.disabled = disabled;
 }
 
 function setStatus(text: string, tone: 'info' | 'warn' = 'info'): void {
@@ -130,6 +159,7 @@ function setStatus(text: string, tone: 'info' | 'warn' = 'info'): void {
 
 function clearOutcome(): void {
   resultEl.hidden = true;
+  actionsEl.hidden = false;
   errorEl.hidden = true;
   if (downloadUrl) URL.revokeObjectURL(downloadUrl);
   downloadUrl = null;
@@ -142,6 +172,8 @@ async function convert(): Promise<void> {
   clearOutcome();
   convertBtn.disabled = true;
   convertBtn.classList.add('loading');
+  convertBtn.setAttribute('aria-busy', 'true');
+  $('convert-label').textContent = 'Konvertiere …';
   setStatus('Datei wird gelesen …');
   try {
     const data = await file.arrayBuffer();
@@ -158,12 +190,14 @@ async function convert(): Promise<void> {
     $('error-text').textContent = msg;
     errorEl.hidden = false;
     setStatus('');
-    console.error(e);
+    if (!(e instanceof ConversionError)) console.error(e);
   } finally {
     busy = false;
     setTypesDisabled(false);
     convertBtn.classList.remove('loading');
-    convertBtn.disabled = !file;
+    convertBtn.removeAttribute('aria-busy');
+    $('convert-label').textContent = 'Konvertieren';
+    convertBtn.disabled = !file || fileRow.classList.contains('is-invalid');
   }
 }
 
@@ -177,14 +211,17 @@ function showResult(r: ConversionResult): void {
   downloadEl.download = r.fileName;
   $('download-label').textContent = `${r.fileName} herunterladen`;
   $('result-summary').textContent = r.summary;
+  $('result-file').textContent = r.fileName;
+  const warnings = r.notices.filter((n) => n.level === 'warn').length;
+  $('result-notices').textContent =
+    r.notices.length === 0 ? 'keine' : `${r.notices.length}${warnings ? `, davon ${warnings} zum Prüfen` : ''} – Details unten`;
 
   const notices = $('notices') as HTMLDetailsElement;
   const list = $('notices-list');
   list.innerHTML = '';
   notices.hidden = r.notices.length === 0;
   notices.open = false;
-  const warnCount = r.notices.filter((n) => n.level === 'warn').length;
-  $('notices-summary').textContent = `${r.notices.length} ${r.notices.length === 1 ? 'Hinweis' : 'Hinweise'} anzeigen${warnCount ? ' – bitte prüfen' : ''}`;
+  $('notices-summary').textContent = `${r.notices.length} ${r.notices.length === 1 ? 'Hinweis' : 'Hinweise'} anzeigen${warnings ? ' – bitte prüfen' : ''}`;
   for (const n of r.notices.slice(0, 500)) {
     const li = document.createElement('li');
     li.dataset.level = n.level;
@@ -202,6 +239,8 @@ function showResult(r: ConversionResult): void {
     list.appendChild(li);
   }
   resultEl.hidden = false;
+  // One primary action per view: while the result is shown, the download is it.
+  actionsEl.hidden = true;
   resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
@@ -238,7 +277,11 @@ window.addEventListener('drop', (e) => {
   if (files.length > 1) setStatus('Bitte nur eine Datei gleichzeitig ablegen – die erste wurde übernommen.', 'warn');
 });
 
-$('file-remove').addEventListener('click', () => setFile(null));
+$('file-remove').addEventListener('click', () => {
+  setFile(null);
+  dropzone.focus();
+});
+$('file-replace').addEventListener('click', () => fileInput.click());
 convertBtn.addEventListener('click', convert);
 $('again').addEventListener('click', () => {
   setFile(null);
@@ -246,4 +289,5 @@ $('again').addEventListener('click', () => {
 });
 
 renderTypes();
+renderFormats();
 select(selected.id);
