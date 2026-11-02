@@ -16,7 +16,7 @@ export interface ConversionResult {
   summary: string;
 }
 
-export type ConverterId = 'tags' | 'textlists' | 'alarms' | 'lineBreaks';
+export type ConverterId = 'tags' | 'tagEvents' | 'textlists' | 'alarms' | 'lineBreaks';
 
 export class NoticeLog {
   readonly items: Notice[] = [];
@@ -82,12 +82,13 @@ export function protectedSheetError(name: string): ConversionError {
 }
 
 /** Kind of TIA Portal export, recognised from sheet names and column headers. */
-export type ExportKind = 'textlist' | 'alarms' | 'tags';
+export type ExportKind = 'textlist' | 'alarms' | 'tags' | 'events';
 
 const KIND_HINT: Record<ExportKind, string> = {
   textlist: 'ein Textlisten-Export – bitte „Textlisten“ wählen',
   alarms: 'ein Meldungs-Export – bitte „HMI-Meldungen“ oder „Meldetexte umbrechen“ wählen',
-  tags: 'ein Variablen-Export – bitte „HMI-Variablen“ wählen',
+  tags: 'ein Variablen-Export – bitte „HMI-Variablen“ oder „Variablen-Ereignisse“ wählen',
+  events: 'eine Ereignis-Tabelle – bitte „Variablen-Ereignisse“ wählen',
 };
 
 /** Header texts of the first row of a sheet (only the leading columns, where TIA puts its fixed headers). */
@@ -101,6 +102,7 @@ export function headerTexts(sheet: Sheet, maxCols = 60): string[] {
 }
 
 export async function detectExportKind(wb: Workbook): Promise<ExportKind | null> {
+  if (wb.sheetIndexByName('Ereignisse') >= 0) return 'events';
   if (wb.sheetIndexByName('TextList') >= 0 && wb.sheetIndexByName('TextListEntry') >= 0) return 'textlist';
   const headers = headerTexts(await wb.sheet(0)).map((h) => h.toLowerCase());
   if (headers.some((h) => h.startsWith('alarm text'))) return 'alarms';
