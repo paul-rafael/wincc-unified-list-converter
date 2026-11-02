@@ -106,11 +106,22 @@
               <dd id="result-notices"></dd>
             </dl>
             <div class="result-actions">
+              <button type="button" class="btn btn-primary" id="copy" hidden>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2" /><path d="M5 15V5a2 2 0 0 1 2-2h10" /></svg>
+                <span id="copy-label">Skript kopieren</span>
+              </button>
               <a class="btn btn-primary" id="download" download>
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v12" /><path d="m7 11 5 5 5-5" /><path d="M4 20h16" /></svg>
                 <span id="download-label">Herunterladen</span>
               </a>
               <button type="button" class="btn btn-ghost" id="again">Weitere Datei konvertieren</button>
+            </div>
+            <div class="code-result" id="code-result" hidden>
+              <div class="code-head">
+                <span class="code-name" id="code-name"></span>
+                <span class="code-lines" id="code-lines"></span>
+              </div>
+              <pre class="code" tabindex="0"><code id="code"></code></pre>
             </div>
             <details class="notices" id="notices" hidden>
               <summary id="notices-summary"></summary>
@@ -190,25 +201,25 @@
           <div class="guide-grid">
             <div>
               <h3>Wofür?</h3>
-              <p>WinCC Unified kennt keine Variablen-Ereignisse wie WinCC Advanced (<em>Wertänderung</em>, <em>Bei Überschreitung</em>, <em>Bei Unterschreitung</em>). Ersatz ist ein Skript, das zyklisch läuft. Diese Funktion erzeugt es aus einer Tabelle.</p>
-              <p class="guide-note"><strong>Wichtig:</strong> Der Excel-Export des TIA Portals enthält die Ereignisse nicht. Du trägst sie deshalb einmal in der Vorlage ein – Variablen mit Grenzwert sind schon vorbelegt, alle Namen werden gegen den Export geprüft.</p>
+              <p>WinCC Unified kennt keine Variablen-Ereignisse wie WinCC Advanced (<em>Wertänderung</em>, <em>Bei Überschreitung</em>, <em>Bei Unterschreitung</em>). Ersatz ist ein Skript, das zyklisch läuft. Diese Funktion liest die Ereignisse mit ihren Funktionslisten aus dem Openness-Export und erzeugt das fertige Skript.</p>
               <h3>So gehst du vor</h3>
               <ol class="steps">
-                <li>Die HMI-Variablen des alten Projekts exportieren.</li>
-                <li>Oben <em>Variablen-Ereignisse</em> wählen, den Export hochladen und <code>TagEvents.xlsx</code> herunterladen.</li>
-                <li>Im Blatt <code>Ereignisse</code> pro Aktion eine Zeile eintragen: Trigger, Ereignis, Aktion, Ziel und Wert bzw. Formel, z. B. <code>{Trigger} + 12</code>.</li>
-                <li>Die ausgefüllte Datei wieder hochladen und <code>TagEvent.js</code> herunterladen.</li>
-                <li>Das Skript in ein globales Skriptmodul übernehmen, <code>var TagEventLast = {};</code> in die globalen Definitionen, und <code>TagEvent()</code> zyklisch aufrufen, z. B. über eine Aufgabe im Scheduler.</li>
+                <li>Die HMI-Variablen des Advanced-Geräts per TIA Openness exportieren (ZIP mit <code>manifest.json</code> und <code>Tags/*.xml</code>).</li>
+                <li>Oben <em>Variablen-Ereignisse</em> wählen, die ZIP hochladen und konvertieren.</li>
+                <li><strong>Skript kopieren</strong> und in ein globales Skriptmodul einfügen. Die Zeile <code>var TagEventLast = {};</code> gehört in die globalen Definitionen des Moduls.</li>
+                <li><code>TagEvent()</code> zyklisch aufrufen, z. B. über eine Aufgabe im Scheduler, und die Hinweise im Ergebnis abarbeiten.</li>
               </ol>
+              <p class="guide-note"><strong>Ohne Openness:</strong> Der Excel-Export der HMI-Variablen enthält keine Ereignisse. Lädst du ihn hoch, entsteht eine Vorlage <code>TagEvents.xlsx</code>, in die du die Ereignisse einträgst; die ausgefüllte Vorlage ergibt ebenfalls das Skript.</p>
             </div>
             <aside class="rules">
               <h4>Was im Skript entsteht</h4>
               <ul>
-                <li>Eine Funktion pro Eintrag in der Spalte <em>Funktion</em>, aufgerufen aus <code>TagEvent()</code>; mehrere Trigger und Aktionen pro Funktion sind möglich.</li>
-                <li><em>Variable setzen</em> schreibt bei jedem Aufruf; bei Über-/Unterschreitung nur, solange der Grenzwert über- bzw. unterschritten ist.</li>
-                <li><em>Bild wechseln</em> und <em>Skript</em> laufen nur, wenn das Ereignis eintritt – nicht bei jedem Zyklus und nicht beim Start.</li>
-                <li>Formeln: Zahlen, <code>+ - * / %</code>, Klammern, <code>Math.*</code> und <code>{Variable}</code>. Ungültige Formeln und unbekannte Variablen werden mit Zelle gemeldet.</li>
-                <li>Eingabe: <code>.xlsx</code> · Ergebnis: <code>TagEvents.xlsx</code> (Vorlage) bzw. <code>TagEvent.js</code></li>
+                <li>Eine Funktion pro Ereignis; mehrere Ereignisse und Funktionslisten-Einträge pro Variable werden übernommen.</li>
+                <li><em>Wertänderung</em> läuft nur, wenn sich der Wert ändert; <em>Überschreitung</em> nur beim Überschreiten des Grenzwerts aus der Variable.</li>
+                <li>Nach dem Start werden Berechnungen einmal ausgeführt, damit abhängige Variablen stimmen; Bildwechsel nicht.</li>
+                <li>Umgesetzt: <code>SetTag</code>, <code>LinearScaling</code>, <code>InvertLinearScaling</code>, <code>SetBit</code>, <code>ResetBit</code>, <code>InvertBit</code>, <code>IncreaseValue</code>, <code>DecreaseValue</code>, <code>ActivateScreen</code>, <code>ActivateScreenByNumber</code> (mit Bildnummern-Tabelle). Andere Funktionen erscheinen als <code>// TODO</code> mit Hinweis.</li>
+                <li>Variablennamen werden wie bei <em>HMI-Variablen</em> übersetzt (<code>12V_CCS\HmiSc\AdrNoScan</code> → <code>12V_CCS_HmiSc_AdrNoScan</code>).</li>
+                <li>Eingabe: <code>.zip</code>, <code>.xml</code> (oder <code>.xlsx</code>) · Ergebnis: <code>TagEvent.js</code> zum Kopieren</li>
               </ul>
             </aside>
           </div>

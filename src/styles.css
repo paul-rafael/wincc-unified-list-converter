@@ -154,6 +154,14 @@ body.dragging .file-row { border-color: var(--accent); border-style: dashed; }
 .result-facts dt { color: var(--text-3); }
 .result-facts dd { margin: 0; color: var(--text); min-width: 0; overflow-wrap: anywhere; }
 .result-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.result-actions [hidden] { display: none; }
+.code-result { border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface); overflow: hidden; }
+.code-result[hidden] { display: none; }
+.code-head { display: flex; justify-content: space-between; gap: 12px; padding: 9px 14px; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text-2); }
+.code-name { font-family: var(--mono); color: var(--text); }
+.code { margin: 0; max-height: 420px; overflow: auto; padding: 14px 16px; background: var(--code-bg); font-family: var(--mono); font-size: 12.5px; line-height: 1.55; color: var(--text); tab-size: 4; }
+.code code { background: none; padding: 0; font-size: inherit; white-space: pre; word-break: normal; }
+.code:focus-visible { outline-offset: -2px; }
 .result-actions .btn svg { width: 17px; height: 17px; }
 #download-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 60vw; }
 .error { background: var(--accent-soft); border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent); }

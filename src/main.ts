@@ -22,6 +22,8 @@ const resultEl = $('result');
 const errorEl = $('error');
 const downloadEl = $<HTMLAnchorElement>('download');
 const fileErrorEl = $('file-error');
+const copyBtn = $<HTMLButtonElement>('copy');
+const codeEl = $('code');
 const actionsEl = convertBtn.closest<HTMLElement>('.actions')!;
 
 let selected: ConverterDef = CONVERTERS[0];
@@ -214,6 +216,17 @@ function showResult(r: ConversionResult): void {
   downloadEl.href = downloadUrl;
   downloadEl.download = r.fileName;
   $('download-label').textContent = `${r.fileName} herunterladen`;
+
+  // Scripts: show them and make copying the main action, the download stays as an alternative.
+  const isText = r.text !== undefined;
+  $('code-result').hidden = !isText;
+  copyBtn.hidden = !isText;
+  downloadEl.classList.toggle('btn-primary', !isText);
+  downloadEl.classList.toggle('btn-ghost', isText);
+  codeEl.textContent = r.text ?? '';
+  $('code-name').textContent = r.fileName;
+  $('code-lines').textContent = isText ? `${r.text!.split('\n').length} Zeilen` : '';
+  $('copy-label').textContent = 'Skript kopieren';
   $('result-summary').textContent = r.summary;
   $('result-file').textContent = r.fileName;
   const warnings = r.notices.filter((n) => n.level === 'warn').length;
@@ -280,6 +293,26 @@ window.addEventListener('drop', (e) => {
   setFile(files[0]);
   if (files.length > 1) setStatus('Bitte nur eine Datei gleichzeitig ablegen – die erste wurde übernommen.', 'warn');
 });
+
+async function copyScript(): Promise<void> {
+  const text = codeEl.textContent ?? '';
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    // Clipboard API unavailable (e.g. no HTTPS): select the code so Strg+C works.
+    const range = document.createRange();
+    range.selectNodeContents(codeEl);
+    const sel = window.getSelection();
+    sel?.removeAllRanges();
+    sel?.addRange(range);
+    const ok = document.execCommand('copy');
+    $('copy-label').textContent = ok ? 'Kopiert' : 'Markiert – mit Strg+C kopieren';
+    return;
+  }
+  $('copy-label').textContent = 'Kopiert';
+  setTimeout(() => ($('copy-label').textContent = 'Skript kopieren'), 2500);
+}
+copyBtn.addEventListener('click', () => void copyScript());
 
 $('file-remove').addEventListener('click', () => {
   setFile(null);

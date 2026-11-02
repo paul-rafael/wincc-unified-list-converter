@@ -13,6 +13,7 @@ import { cellRef } from '../xlsx/ref';
 import type { CellValue, Sheet, WriteValue } from '../xlsx/workbook';
 import { Workbook } from '../xlsx/workbook';
 import { assertExportKind, assertExtension, ConversionResult, headerTexts, NoticeLog } from './common';
+import { convertAdvancedEvents } from './tagEventsXml';
 
 export const TEMPLATE_NAME = 'TagEvents.xlsx';
 export const SCRIPT_NAME = 'TagEvent.js';
@@ -385,7 +386,9 @@ export function buildEventScript(rows: EventRow[], knownTags: Set<string> | null
 // ------------------------------------------------------------------ entry point
 
 export async function convertTagEvents(input: ArrayBuffer | Uint8Array, fileName: string): Promise<ConversionResult> {
-  assertExtension(fileName, ['.xlsx', '.xlsm']);
+  assertExtension(fileName, ['.zip', '.xml', '.xlsx', '.xlsm']);
+  // Openness export: the events are in the files, the script is generated directly.
+  if (/\.(zip|xml)$/i.test(fileName)) return convertAdvancedEvents(input, fileName);
   const wb = await Workbook.load(input);
   const log = new NoticeLog();
 
@@ -425,6 +428,7 @@ export async function convertTagEvents(input: ArrayBuffer | Uint8Array, fileName
   return {
     data: new TextEncoder().encode(script),
     fileName: SCRIPT_NAME,
+    text: script,
     notices: log.items,
     summary: `Skript erstellt: ${functions} Funktionen mit ${actions} Aktionen aus ${rows.length} Zeilen.`,
   };
