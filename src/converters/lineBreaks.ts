@@ -8,7 +8,7 @@
  */
 import { cellToVbaString, inStr, vbaMid, vbaTrim } from '../vba/vba';
 import { Workbook } from '../xlsx/workbook';
-import { assertExtension, ConversionResult, NoticeLog, protectedSheetError, where, writeText } from './common';
+import { assertExportKind, assertExtension, ConversionResult, NoticeLog, protectedSheetError, where, writeText } from './common';
 
 export const LINE_BREAK = '¶'; // "¶" – line break marker for the HMI
 const BREAK_WORDS = ['Position:', 'Geschw.:', 'X:', 'Y:', 'Z:'];
@@ -54,6 +54,7 @@ export function formatHmiText(alarmText: string, maxLen = 80): string {
 export async function convertLineBreaks(input: ArrayBuffer | Uint8Array, fileName: string): Promise<ConversionResult> {
   assertExtension(fileName, ['.xlsx', '.xlsm']);
   const wb = await Workbook.load(input);
+  await assertExportKind(wb, 'alarms');
   const ws = await wb.sheet(0);
   if (ws.isProtected) throw protectedSheetError(ws.name);
   const log = new NoticeLog();

@@ -6,8 +6,9 @@
  */
 import { ConversionError } from '../errors';
 import { cellToVbaString, VBS_WS, vbaTrim, worksheetTrim } from '../vba/vba';
-import { Workbook } from '../xlsx/workbook';
-import { assertExtension, ConversionResult, NoticeLog, protectedSheetError, stemOf, where, writeText } from './common';
+import { cellRef } from '../xlsx/ref';
+import { Workbook, type Sheet } from '../xlsx/workbook';
+import { assertExportKind, assertExtension, ConversionResult, headerTexts, NoticeLog, protectedSheetError, stemOf, where, writeText } from './common';
 
 const DASH = '—'; // "—" as written by the macro
 const NO_VALUE = '<no value>';
@@ -40,13 +41,33 @@ export function extractTextListValue(kText: string): string {
   return m ? vbaTrim(m[1]) : '';
 }
 
+/**
+ * The macro writes the language columns E–J and reads FieldInfos from K. Newer exports have a single
+ * "FieldInfos" column right after their language columns; if it sits inside E–J the macro would
+ * overwrite it, so stop instead.
+ */
+function assertLegacyLayout(ws: Sheet): void {
+  const headers = headerTexts(ws, 11);
+  const col = headers.findIndex((h) => h.toLowerCase() === 'fieldinfos') + 1;
+  if (col >= 5 && col <= 10) {
+    const languages = col - 5;
+    throw new ConversionError(
+      `Diese Textliste hat ${languages} ${languages === 1 ? 'Sprachspalte' : 'Sprachspalten'} und die Spalte „FieldInfos“ in ${cellRef(1, col).replace(/\d+$/, '')}. ` +
+        '„Textlisten · Klassisch“ erwartet das Layout des Original-Makros (Sprachen in E–J, FieldInfos in K) und würde hier Daten überschreiben. ' +
+        'Bitte „Textlisten · Aktuell“ verwenden.',
+    );
+  }
+}
+
 export async function convertTextlistLegacy(input: ArrayBuffer | Uint8Array, fileName: string): Promise<ConversionResult> {
   assertExtension(fileName, ['.xlsx', '.xlsm']);
   const wb = await Workbook.load(input);
+  await assertExportKind(wb, 'textlist');
   const idx = wb.sheetIndexByName('TextListEntry');
   if (idx < 0) throw new ConversionError('Arbeitsblatt „TextListEntry“ nicht gefunden! Bitte eine Textlisten-Exportdatei aus dem TIA Portal verwenden.');
   const ws = await wb.sheet(idx);
   if (ws.isProtected) throw protectedSheetError(ws.name);
+  assertLegacyLayout(ws);
   const log = new NoticeLog();
 
   const text = (r: number, c: number) => cellToVbaString(ws.getCell(r, c).value, ws.isDateFormatted(r, c), wb.date1904, where(ws, r, c));

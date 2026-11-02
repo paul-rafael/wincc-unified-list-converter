@@ -9,7 +9,7 @@ import { cellRef } from '../xlsx/ref';
 import { buildWorkbook } from '../xlsx/newWorkbook';
 import type { CellValue, WriteValue } from '../xlsx/workbook';
 import { Workbook } from '../xlsx/workbook';
-import { assertExtension, ConversionResult, NoticeLog, where } from './common';
+import { assertExportKind, assertExtension, ConversionResult, NoticeLog, where } from './common';
 
 export const ALARMS_OUTPUT_NAME = 'Unified_HMI-Alarms.xlsx';
 export const ALARMS_SHEET_NAME = 'DiscreteAlarms';
@@ -103,6 +103,7 @@ export function buildFieldInfo(alarmText: string, fieldInfoOld: string, context 
 export async function convertAlarms(input: ArrayBuffer | Uint8Array, fileName: string): Promise<ConversionResult> {
   assertExtension(fileName, ['.xlsx', '.xlsm']);
   const wb = await Workbook.load(input);
+  await assertExportKind(wb, 'alarms');
   const ws = await wb.sheet(0);
   const log = new NoticeLog();
   const grid = new Map<number, Map<number, WriteValue>>();

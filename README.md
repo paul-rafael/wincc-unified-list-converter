@@ -23,10 +23,9 @@ Bei der Migration eines WinCC-Projekts auf Unified Panels müssen HMI-Variablen,
 | | Funktion | Was sie macht | Eingabe | Ergebnis |
 |---|---|---|---|---|
 | 1 | **HMI-Variablen** | Ersetzt alle Sonderzeichen in Variablennamen durch `_` | `.xlsx` | `HMITagList_MIGUNI.xlsx` |
-| 2 | **Textlisten · Klassisch** | Bereinigt Platzhalter (`<No value>`, `<field ref="0" />`) und Tags, füllt leere Sprachvarianten | `.xlsx` `.xlsm` | `<Name>_MIGUNI.xlsx` |
-| 3 | **Textlisten · Aktuell** | Ersetzt `# / .` und `[ ]` in den Namen von Textlisten und Einträgen und wandelt die `FieldInfos` ins Unified-Format um | `.xlsx` `.xlsm` | `<Name>.xlsx` |
-| 4 | **HMI-Meldungen** | Erzeugt die Unified-Alarmliste `DiscreteAlarms` (44 Spalten) inkl. neuer FieldInfo | `.xlsx` `.xlsm` | `Unified_HMI-Alarms.xlsx` |
-| 5 | **Meldetexte umbrechen** | Teilt Meldetexte in Fehlercode und Zeilen à max. 80 Zeichen (`¶`) | `.xlsx` `.xlsm` | gleicher Dateiname |
+| 2 | **Textlisten** | Erkennt das Exportformat selbst: aktuelle Exporte (mit `FieldInfos`) – Namen bereinigen (`# / .` und `[ ]`), FieldInfos ins Unified-Format; ältere Exporte – Platzhalter (`<No value>`, `<field ref="0" />`) bereinigen, leere Sprachen füllen | `.xlsx` `.xlsm` | `<Name>.xlsx` bzw. `<Name>_MIGUNI.xlsx` |
+| 3 | **HMI-Meldungen** | Erzeugt die Unified-Alarmliste `DiscreteAlarms` (44 Spalten) inkl. neuer FieldInfo | `.xlsx` `.xlsm` | `Unified_HMI-Alarms.xlsx` |
+| 4 | **Meldetexte umbrechen** | Teilt Meldetexte in Fehlercode und Zeilen à max. 80 Zeichen (`¶`) | `.xlsx` `.xlsm` | gleicher Dateiname |
 
 Eine ausführliche Anleitung zu jeder Funktion ist direkt in die Anwendung integriert.
 
@@ -69,7 +68,7 @@ npm run dev        # Entwicklungsserver auf http://localhost:5173
 
 ```
 src/
-├── converters/   Die fünf Funktionen – je eine Datei, mit Verweis auf die Originalregel
+├── converters/   Die vier Funktionen – je eine Datei, mit Verweis auf die Originalregel
 ├── vba/          Nachbildung von VBA-/Excel-Verhalten (Trim, Like, CStr, Texterkennung)
 ├── xlsx/         XLSX lesen, Zellen formattreu ändern, neue Arbeitsmappen schreiben
 ├── main.ts       Oberfläche

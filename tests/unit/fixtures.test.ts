@@ -25,8 +25,10 @@ describe('fixtures written by openpyxl', () => {
     expect(get(2, 'D')).toEqual(str('DB1.Motor[1].Ist'));
   });
 
-  it('Textlisten · Legacy', async () => {
-    const res = await run('textlistLegacy', 'TextLists.xlsx');
+  it('Textlisten: älteres Format ohne FieldInfos → klassische Bereinigung', async () => {
+    const res = await run('textlists', 'TextLists.xlsx');
+    expect(res.fileName).toBe('TextLists_MIGUNI.xlsx');
+    expect(res.summary).toMatch(/Älteres Exportformat/);
     const get = await readSheet(res.data, 'TextListEntry');
     expect(get(2, 'F')).toEqual(str('Automatik'));
     expect(get(2, 'G')).toEqual(str('Auto matic'));
@@ -35,14 +37,10 @@ describe('fixtures written by openpyxl', () => {
     expect(get(3, 'F')).toEqual(str('Modi_Liste'));
   });
 
-  it('Textlisten · Standard', async () => {
-    const res = await run('textlistStandard', 'TextLists.xlsx');
-    expect((await readSheet(res.data, 'TextList'))(2, 'A')).toEqual(str('Betriebs_Art'));
-    expect((await readSheet(res.data, 'TextListEntry'))(2, 'B')).toEqual(str('Betriebs_Art'));
-  });
-
-  it('Textlisten · Aktuell mit FieldInfos (TIA-Export mit BOM)', async () => {
-    const res = await run('textlistStandard', 'HmiTexts.xlsx');
+  it('Textlisten: aktuelles Format mit FieldInfos (TIA-Export mit BOM)', async () => {
+    const res = await run('textlists', 'HmiTexts.xlsx');
+    expect(res.fileName).toBe('HmiTexts.xlsx');
+    expect(res.summary).toMatch(/Aktuelles Exportformat/);
     expect((await readSheet(res.data, 'TextList'))(2, 'A')).toEqual(str('Err_Mod_1'));
     const get = await readSheet(res.data, 'TextListEntry');
     expect(get(2, 'B')).toEqual(str('Err_Mod_1'));

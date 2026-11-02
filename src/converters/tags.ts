@@ -6,13 +6,14 @@
  */
 import { cellToVbaString, replaceNonAlnum } from '../vba/vba';
 import { Workbook } from '../xlsx/workbook';
-import { assertExtension, ConversionResult, NoticeLog, protectedSheetError, where, writeText } from './common';
+import { assertExportKind, assertExtension, ConversionResult, NoticeLog, protectedSheetError, where, writeText } from './common';
 
 export const TAGS_OUTPUT_NAME = 'HMITagList_MIGUNI.xlsx';
 
 export async function convertTags(input: ArrayBuffer | Uint8Array, fileName: string): Promise<ConversionResult> {
   assertExtension(fileName, ['.xlsx']);
   const wb = await Workbook.load(input);
+  await assertExportKind(wb, 'tags');
   const ws = await wb.sheet(0);
   if (ws.isProtected) throw protectedSheetError(ws.name);
   const log = new NoticeLog();
