@@ -10,7 +10,13 @@ import {
 } from '../../src/converters/alarms';
 import { convertTags } from '../../src/converters/tags';
 import { convertTextlistLegacy, extractTextListValue, legacyCellValue, legacyOutputName } from '../../src/converters/textlistLegacy';
-import { convertTextlistStandard, replaceSpecialChars, standardOutputName } from '../../src/converters/textlistStandard';
+import {
+  convertFieldInfoRef,
+  convertFieldInfos,
+  convertTextlistStandard,
+  replaceSpecialChars,
+  standardOutputName,
+} from '../../src/converters/textlistStandard';
 import { empty, makeXlsx, num, readSheet, str } from '../helpers';
 
 const DASH = '—';
@@ -201,6 +207,54 @@ describe('Textlisten · Standard (ReplaceSpecialCharsInWorkbook)', () => {
     const res = await convertTextlistStandard(input, 'L.xlsx');
     expect(res.notices[0].text).toMatch(/TextListEntry/);
     expect((await readSheet(res.data, 'TextList'))(2, 'A')).toEqual(str('a_b'));
+  });
+
+  it('converts classic FieldInfos to the Unified format', () => {
+    expect(convertFieldInfoRef('<ref id = 0; type = CommonTextList; TextList = SRM_Inverter_SEW; Tag = "12V_CCS\\Err\\Err5.AddNo"; Length = 79;>')).toBe(
+      '<ref id = 0; type = ILCommonTagDisplayFormatWithTextList; TextList = SRM_Inverter_SEW; Tag = 12V_CCS_Err_Err5_AddNo; DisplayType = Textlist; Length = 5; Precision = 0; Alignment = Right; ZeroPadding = False;>',
+    );
+    expect(convertFieldInfoRef('<ref id = 0; type = CommonTagDisplayFormat; Tag = 12V_CCS\\Txt\\Lac_1; DisplayType = Text; DisplayFormat = ????????????????????;>')).toBe(
+      '<ref id = 0; type = ILCommonTagDisplayFormat; Tag = 12V_CCS_Txt_Lac_1; DisplayType = Text; Length = 20; Precision = 0; Alignment = Left; ZeroPadding = False;>',
+    );
+    // list names get the same replacement as the TextList sheet
+    expect(convertFieldInfoRef('<ref id = 1; type = CommonTextList; TextList = Liste.A; Tag = T; Length = 79;>')).toMatch(/TextList = Liste_A; Tag = T;/);
+    const unified = '<ref id = 0; type = ILCommonTagDisplayFormat; Tag = A; DisplayType = Text; Length = 4; Precision = 0; Alignment = Left; ZeroPadding = False;>';
+    expect(convertFieldInfoRef(unified)).toBe(unified);
+    expect(convertFieldInfoRef('<ref id = 0; type = CommonTagDisplayFormat; Tag = A; DisplayType = Decimal; DisplayFormat = 999;>')).toBeNull();
+  });
+
+  it('keeps the trailing line break and reports unknown refs', () => {
+    const unknown: string[] = [];
+    const out = convertFieldInfos('<ref id = 0; type = CommonTextList; TextList = L; Tag = A.B; Length = 79;>\n<ref id = 1; type = Other; Tag = X;>', unknown);
+    expect(out).toBe(
+      '<ref id = 0; type = ILCommonTagDisplayFormatWithTextList; TextList = L; Tag = A_B; DisplayType = Textlist; Length = 5; Precision = 0; Alignment = Right; ZeroPadding = False;>\n<ref id = 1; type = Other; Tag = X;>',
+    );
+    expect(unknown).toEqual(['<ref id = 1; type = Other; Tag = X;>']);
+  });
+
+  it('finds the FieldInfos column behind the language columns', async () => {
+    const info = '<ref id = 0; type = CommonTagDisplayFormat; Tag = Txt\\Lac_1; DisplayType = Text; DisplayFormat = ????;>\n';
+    const input = await makeXlsx([
+      { name: 'TextList', rows: { 1: { A: 'Name' }, 2: { A: 'L' } } },
+      {
+        name: 'TextListEntry',
+        rows: {
+          1: { A: 'Name', B: 'Parent', E: 'Text [de-DE]', F: 'Text [en-GB]', G: 'FieldInfos' },
+          2: { A: 'Text list entry_1', B: 'L', E: '<field ref="0" />', F: '<field ref="0" />', G: info },
+          3: { A: 'Text list entry_2', B: 'L', E: 'x', G: '' },
+          4: { A: 'Text list entry_3', B: 'L', G: '<ref id = 0; type = Mystery;>' },
+        },
+      },
+    ]);
+    const res = await convertTextlistStandard(input, 'Hmi_Texts.xlsx');
+    const tle = await readSheet(res.data, 'TextListEntry');
+    expect(tle(2, 'G')).toEqual(
+      str('<ref id = 0; type = ILCommonTagDisplayFormat; Tag = Txt_Lac_1; DisplayType = Text; Length = 4; Precision = 0; Alignment = Left; ZeroPadding = False;>\n'),
+    );
+    expect(tle(2, 'E')).toEqual(str('<field ref="0" />'));
+    expect(res.summary).toMatch(/FieldInfos: 1 ins Unified-Format/);
+    expect(res.notices).toHaveLength(1);
+    expect(res.notices[0].cell).toBe('TextListEntry!G4');
   });
 });
 

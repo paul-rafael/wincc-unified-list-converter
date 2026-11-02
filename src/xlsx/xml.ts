@@ -9,7 +9,8 @@ export const XML_DECL = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 export function parseXml(text: string, partName: string): Document {
   let doc: Document;
   try {
-    doc = new DOMParser().parseFromString(text, 'application/xml');
+    // TIA Portal writes its exports with a UTF-8 byte order mark, which JSZip keeps in the string.
+    doc = new DOMParser().parseFromString(text.replace(/^\uFEFF/, ''), 'application/xml');
   } catch (e) {
     throw new ConversionError(`Die Datei ist beschädigt (XML-Fehler in ${partName}).`);
   }

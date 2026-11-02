@@ -4,6 +4,19 @@ Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Das Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 die Versionierung folgt [Semantic Versioning](https://semver.org/lang/de/).
 
+## [1.1.0] - 2026-11-02
+
+### Neu
+
+- **Textlisten · Aktuell** wandelt jetzt auch die Spalte `FieldInfos` ins Unified-Format um
+  (`CommonTextList` → `ILCommonTagDisplayFormatWithTextList`, `CommonTagDisplayFormat` → `ILCommonTagDisplayFormat`).
+  Variablennamen werden dabei wie bei den HMI-Variablen bereinigt. Damit entspricht ein Textlisten-Export
+  aus dem klassischen Projekt dem Format eines Unified-Textlisten-Exports.
+
+### Behoben
+
+- Exportdateien direkt aus dem TIA Portal (XML mit UTF-8-BOM) wurden als „beschädigt“ abgelehnt.
+
 ## [1.0.0] - 2026-10-19
 
 Erste stabile Version des WinCC Unified List Converters – eine Webversion des
@@ -26,4 +39,5 @@ Unified Migration Tools, die vollständig im Browser läuft.
 - Responsives Design im hellen und dunklen Modus (PRH Design Kit)
 - Automatisierte Tests für alle Umwandlungsregeln
 
+[1.1.0]: https://github.com/paul-rafael/wincc-unified-list-converter/releases/tag/v1.1.0
 [1.0.0]: https://github.com/paul-rafael/wincc-unified-list-converter/releases/tag/v1.0.0

@@ -41,6 +41,21 @@ describe('fixtures written by openpyxl', () => {
     expect((await readSheet(res.data, 'TextListEntry'))(2, 'B')).toEqual(str('Betriebs_Art'));
   });
 
+  it('Textlisten · Aktuell mit FieldInfos (TIA-Export mit BOM)', async () => {
+    const res = await run('textlistStandard', 'HmiTexts.xlsx');
+    expect((await readSheet(res.data, 'TextList'))(2, 'A')).toEqual(str('Err_Mod_1'));
+    const get = await readSheet(res.data, 'TextListEntry');
+    expect(get(2, 'B')).toEqual(str('Err_Mod_1'));
+    expect(get(2, 'G')).toEqual(
+      str('<ref id = 0; type = ILCommonTagDisplayFormatWithTextList; TextList = Drive_SEW; Tag = Line1_Err_Err5_AddNo; DisplayType = Textlist; Length = 5; Precision = 0; Alignment = Right; ZeroPadding = False;>\n'),
+    );
+    expect(get(4, 'G')).toEqual(
+      str('<ref id = 0; type = ILCommonTagDisplayFormat; Tag = Line1_Order_EL_ID_01; DisplayType = Text; Length = 4; Precision = 0; Alignment = Left; ZeroPadding = False;>\n'),
+    );
+    expect(get(4, 'F')).toEqual(str('Lift <field ref="0" />'));
+    expect(res.notices).toEqual([]);
+  });
+
   it('HMI-Meldungen', async () => {
     const res = await run('alarms', 'HMIAlarms.xlsx');
     const get = await readSheet(res.data, 'DiscreteAlarms');
