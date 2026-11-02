@@ -38,6 +38,7 @@ Excel interpretiert Text, der per VBA in eine Zelle geschrieben wird (`Range.Val
 - **Textlisten · Klassisch:** Zellen mit Kommazahlen, Datumswerten oder Wahrheitswerten werden nicht verändert (Hinweis), weil `CStr` + Rückschreiben in deutschem Excel gebietsschemaabhängig ist.
 - **HMI-Variablen:** Zahlen/Datumswerte in Spalte A werden wie `CStr` in de-DE umgewandelt (`1,5` → `1_5`, Datum → `01_05_2025`), Wahrheitswerte als `Wahr`/`Falsch` (Hinweis).
 - **HMI-Meldungen:** Datumswerte in A–G werden als Zahl übernommen (Excel würde ein Datumsformat setzen; Hinweis).
+- **Textlisten · Aktuell – Erweiterung:** Über das Makro hinaus wird die Spalte `FieldInfos` ins Unified-Format umgewandelt (Textlisten-Felder: Länge 5, rechtsbündig; Text-Felder: Länge = Anzahl `?` im DisplayFormat, linksbündig). Abgeglichen mit einem echten Unified-Export: 94 von 96 Feldern identisch; die zwei Abweichungen stammen von einer Textliste, die im Zielprojekt von Hand auf Länge 20/linksbündig gestellt war.
 - **Textlisten · Aktuell:** Formel- und Fehlerzellen werden nicht verändert (Hinweis); Zahlen bleiben unverändert (in deutschem Excel enthält der Formeltext einer Zahl kein `.`).
 
 ## Technische Unterschiede ohne fachliche Auswirkung

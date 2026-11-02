@@ -24,7 +24,7 @@ Bei der Migration eines WinCC-Projekts auf Unified Panels müssen HMI-Variablen,
 |---|---|---|---|---|
 | 1 | **HMI-Variablen** | Ersetzt alle Sonderzeichen in Variablennamen durch `_` | `.xlsx` | `HMITagList_MIGUNI.xlsx` |
 | 2 | **Textlisten · Klassisch** | Bereinigt Platzhalter (`<No value>`, `<field ref="0" />`) und Tags, füllt leere Sprachvarianten | `.xlsx` `.xlsm` | `<Name>_MIGUNI.xlsx` |
-| 3 | **Textlisten · Aktuell** | Ersetzt `# / .` und `[ ]` in den Namen von Textlisten und Einträgen | `.xlsx` `.xlsm` | `<Name>.xlsx` |
+| 3 | **Textlisten · Aktuell** | Ersetzt `# / .` und `[ ]` in den Namen von Textlisten und Einträgen und wandelt die `FieldInfos` ins Unified-Format um | `.xlsx` `.xlsm` | `<Name>.xlsx` |
 | 4 | **HMI-Meldungen** | Erzeugt die Unified-Alarmliste `DiscreteAlarms` (44 Spalten) inkl. neuer FieldInfo | `.xlsx` `.xlsm` | `Unified_HMI-Alarms.xlsx` |
 | 5 | **Meldetexte umbrechen** | Teilt Meldetexte in Fehlercode und Zeilen à max. 80 Zeichen (`¶`) | `.xlsx` `.xlsm` | gleicher Dateiname |
 

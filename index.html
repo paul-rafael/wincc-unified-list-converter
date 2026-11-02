@@ -202,7 +202,7 @@
           <div class="guide-grid">
             <div>
               <h3>Wofür?</h3>
-              <p>Für Textlisten <strong>neuerer Panel-Projekte</strong>, deren Texte bereits sauber sind. Die Namen der Textlisten und Einträge werden in eine von Unified akzeptierte Schreibweise gebracht.</p>
+              <p>Für Textlisten <strong>neuerer Panel-Projekte</strong>, deren Texte bereits sauber sind. Die Namen der Textlisten und Einträge werden in eine von Unified akzeptierte Schreibweise gebracht, und die Feldverweise (<code>FieldInfos</code>) werden in das Unified-Format umgewandelt – so wie in einem Textlisten-Export aus Unified.</p>
               <h3>So gehst du vor</h3>
               <ol class="steps">
                 <li>Die Textlisten im alten Projekt exportieren.</li>
@@ -215,6 +215,9 @@
               <ul>
                 <li>Blatt <code>TextList</code> Spalte A und Blatt <code>TextListEntry</code> Spalte B, jeweils ab Zeile 2.</li>
                 <li><code>#</code>, <code>/</code> und <code>.</code> werden zu <code>_</code>; <code>[</code> wird zu <code>(</code>, <code>]</code> zu <code>)</code>.</li>
+                <li>Spalte <code>FieldInfos</code> in <code>TextListEntry</code>: <code>CommonTextList</code> wird zu <code>ILCommonTagDisplayFormatWithTextList</code> (Länge 5, rechtsbündig), <code>CommonTagDisplayFormat</code> mit Text-Format <code>????</code> zu <code>ILCommonTagDisplayFormat</code> (Länge = Anzahl <code>?</code>, linksbündig).</li>
+                <li>Variablennamen in den FieldInfos verlieren Anführungszeichen; <code>\</code>, <code>.</code> und alle anderen Sonderzeichen werden zu <code>_</code> – passend zur Funktion <em>HMI-Variablen</em>.</li>
+                <li>Bereits umgewandelte FieldInfos bleiben unverändert, unbekannte Formate werden als Hinweis gemeldet.</li>
                 <li>Fehlt eines der Blätter, wird es mit Hinweis übersprungen.</li>
                 <li>Eingabe: <code>.xlsx</code>, <code>.xlsm</code> · Ergebnis: gleicher Dateiname als <code>.xlsx</code></li>
               </ul>

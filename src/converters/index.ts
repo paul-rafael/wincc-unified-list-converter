@@ -37,7 +37,7 @@ export const CONVERTERS: ConverterDef[] = [
   {
     id: 'textlistStandard',
     title: 'Textlisten · Aktuell',
-    subtitle: 'Sonderzeichen in Textlisten-Namen ersetzen',
+    subtitle: 'Namen bereinigen, FieldInfos ins Unified-Format',
     legacyName: 'HMI TextList Konverter (neu)',
     accept: ['.xlsx', '.xlsm'],
     run: convertTextlistStandard,
