@@ -29,7 +29,7 @@
           <p class="eyebrow">TIA Portal → WinCC Unified</p>
           <h1>Excel-Listen für <em>WinCC Unified</em> aufbereiten</h1>
           <p class="lead">
-            Konvertiert exportierte HMI-Variablen, Textlisten und HMI-Meldungen in ein Format, das WinCC Unified akzeptiert.
+            Konvertiert exportierte HMI-Variablen, Textlisten und HMI-Meldungen in ein Format, das WinCC Unified akzeptiert, und erzeugt den Skript-Ersatz für Variablen-Ereignisse.
             Datei auswählen, konvertieren, herunterladen – kostenlos, ohne Anmeldung und ohne Upload.
           </p>
         </div>
@@ -181,6 +181,34 @@
                 <li>Jedes Zeichen außer <code>A–Z</code>, <code>a–z</code>, <code>0–9</code> wird zu <code>_</code> – auch Umlaute, ß, Leerzeichen und Bindestriche.</li>
                 <li>Alle anderen Spalten, Blätter und Formatierungen bleiben unverändert.</li>
                 <li>Eingabe: <code>.xlsx</code> · Ergebnis: <code>HMITagList_MIGUNI.xlsx</code></li>
+              </ul>
+            </aside>
+          </div>
+        </article>
+
+        <article class="guide-panel" data-guide="tagEvents" hidden>
+          <div class="guide-grid">
+            <div>
+              <h3>Wofür?</h3>
+              <p>WinCC Unified kennt keine Variablen-Ereignisse wie WinCC Advanced (<em>Wertänderung</em>, <em>Bei Überschreitung</em>, <em>Bei Unterschreitung</em>). Ersatz ist ein Skript, das zyklisch läuft. Diese Funktion erzeugt es aus einer Tabelle.</p>
+              <p class="guide-note"><strong>Wichtig:</strong> Der Excel-Export des TIA Portals enthält die Ereignisse nicht. Du trägst sie deshalb einmal in der Vorlage ein – Variablen mit Grenzwert sind schon vorbelegt, alle Namen werden gegen den Export geprüft.</p>
+              <h3>So gehst du vor</h3>
+              <ol class="steps">
+                <li>Die HMI-Variablen des alten Projekts exportieren.</li>
+                <li>Oben <em>Variablen-Ereignisse</em> wählen, den Export hochladen und <code>TagEvents.xlsx</code> herunterladen.</li>
+                <li>Im Blatt <code>Ereignisse</code> pro Aktion eine Zeile eintragen: Trigger, Ereignis, Aktion, Ziel und Wert bzw. Formel, z. B. <code>{Trigger} + 12</code>.</li>
+                <li>Die ausgefüllte Datei wieder hochladen und <code>TagEvent.js</code> herunterladen.</li>
+                <li>Das Skript in ein globales Skriptmodul übernehmen, <code>var TagEventLast = {};</code> in die globalen Definitionen, und <code>TagEvent()</code> zyklisch aufrufen, z. B. über eine Aufgabe im Scheduler.</li>
+              </ol>
+            </div>
+            <aside class="rules">
+              <h4>Was im Skript entsteht</h4>
+              <ul>
+                <li>Eine Funktion pro Eintrag in der Spalte <em>Funktion</em>, aufgerufen aus <code>TagEvent()</code>; mehrere Trigger und Aktionen pro Funktion sind möglich.</li>
+                <li><em>Variable setzen</em> schreibt bei jedem Aufruf; bei Über-/Unterschreitung nur, solange der Grenzwert über- bzw. unterschritten ist.</li>
+                <li><em>Bild wechseln</em> und <em>Skript</em> laufen nur, wenn das Ereignis eintritt – nicht bei jedem Zyklus und nicht beim Start.</li>
+                <li>Formeln: Zahlen, <code>+ - * / %</code>, Klammern, <code>Math.*</code> und <code>{Variable}</code>. Ungültige Formeln und unbekannte Variablen werden mit Zelle gemeldet.</li>
+                <li>Eingabe: <code>.xlsx</code> · Ergebnis: <code>TagEvents.xlsx</code> (Vorlage) bzw. <code>TagEvent.js</code></li>
               </ul>
             </aside>
           </div>

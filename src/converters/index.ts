@@ -1,6 +1,7 @@
 import { convertAlarms } from './alarms';
 import { convertLineBreaks } from './lineBreaks';
 import type { ConversionResult, ConverterId } from './common';
+import { convertTagEvents } from './tagEvents';
 import { convertTags } from './tags';
 import { convertTextlists } from './textlists';
 
@@ -24,6 +25,14 @@ export const CONVERTERS: ConverterDef[] = [
     legacyName: 'HMI TagList Konverter',
     accept: ['.xlsx'],
     run: convertTags,
+  },
+  {
+    id: 'tagEvents',
+    title: 'Variablen-Ereignisse',
+    subtitle: 'Ereignis-Skript für Unified erzeugen',
+    legacyName: 'neu, ohne Vorbild im Excel-Tool',
+    accept: ['.xlsx'],
+    run: convertTagEvents,
   },
   {
     id: 'textlists',

@@ -4,6 +4,20 @@ Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Das Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 die Versionierung folgt [Semantic Versioning](https://semver.org/lang/de/).
 
+## [1.3.0] - 2026-11-02
+
+### Neu
+
+- **Variablen-Ereignisse:** Ersatz für die Variablen-Ereignisse aus WinCC Advanced (Wertänderung, Bei Überschreitung,
+  Bei Unterschreitung). Der Excel-Export des TIA Portals enthält diese Ereignisse nicht, deshalb in zwei Schritten:
+  1. HMI-Variablen-Export hochladen → Vorlage `TagEvents.xlsx` mit allen Variablen; Variablen mit Grenzwert sind als
+     Über-/Unterschreitung vorbelegt.
+  2. Ereignisse eintragen (Trigger, Ereignis, Aktion, Ziel, Wert/Formel) und hochladen → Skript `TagEvent.js`.
+  - Formeln mit `{Trigger}` und `{Variablenname}`, z. B. `10000 * {PlcNo} + {Trigger}`.
+  - Grenzwerte werden aus dem Export übernommen und im Skript geprüft.
+  - Bildwechsel und Skripte laufen nur, wenn das Ereignis tatsächlich eintritt – nicht bei jedem Zyklus.
+  - Alle Variablennamen werden gegen den Export geprüft; Fehler werden mit Zelle gemeldet.
+
 ## [1.2.0] - 2026-11-02
 
 ### Geändert
@@ -63,6 +77,7 @@ Unified Migration Tools, die vollständig im Browser läuft.
 - Responsives Design im hellen und dunklen Modus (PRH Design Kit)
 - Automatisierte Tests für alle Umwandlungsregeln
 
+[1.3.0]: https://github.com/paul-rafael/wincc-unified-list-converter/releases/tag/v1.3.0
 [1.2.0]: https://github.com/paul-rafael/wincc-unified-list-converter/releases/tag/v1.2.0
 [1.1.0]: https://github.com/paul-rafael/wincc-unified-list-converter/releases/tag/v1.1.0
 [1.0.0]: https://github.com/paul-rafael/wincc-unified-list-converter/releases/tag/v1.0.0
