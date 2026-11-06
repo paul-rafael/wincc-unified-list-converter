@@ -8,8 +8,9 @@
  * Advanced behaviour that is emulated (TagEvent() is called cyclically):
  * - ChangeValue: the function list runs when the value has changed since the last call.
  * - AboveUpperLimit / BelowLowerLimit: the function list runs when the limit is crossed.
- * - First call after runtime start: tag functions (SetTag, LinearScaling, …) run once, so derived tags are
- *   initialised; screen changes do not.
+ * - First call after runtime start: the function lists run once, so derived tags are initialised.
+ * Screen changes (ActivateScreen, ActivateScreenByNumber) are not possible from a cyclic background script;
+ * they are left out of the script and listed as notices.
  */
 import JSZip from 'jszip';
 import { ConversionError } from '../errors';
@@ -164,7 +165,6 @@ interface Ctx {
   known: Set<string>;
   log: NoticeLog;
   where: string;
-  screensByNumber: boolean;
   /**
    * Tags written earlier in the same function list. Advanced reads the new value right away; in Unified a
    * read directly after SetTagValue is not guaranteed to return it, so the computed value is used instead.
@@ -204,15 +204,12 @@ function linear(a: string, x: string, b: string): string {
   return out === '' ? '0' : out;
 }
 
-interface Statement {
-  code: string;
-  /** Screen changes only run on a real event, not on the first call after runtime start. */
-  onEventOnly: boolean;
-}
+/** A line of script, or a screen change that is left out (description for the notice). */
+type Statement = { code: string } | { screen: string };
 
 function setTag(target: string, value: string, ctx: Ctx): Statement {
   ctx.written.set(target, value);
-  return { code: `HMIRuntime.Tags.SysFct.SetTagValue(${js(target)}, ${value});`, onEventOnly: false };
+  return { code: `HMIRuntime.Tags.SysFct.SetTagValue(${js(target)}, ${value});` };
 }
 
 function statement(e: FunctionEntry, ctx: Ctx, dataTypes: Map<string, string>): Statement | null {
@@ -232,7 +229,7 @@ function statement(e: FunctionEntry, ctx: Ctx, dataTypes: Map<string, string>): 
     const args = Array.from(e.params.entries())
       .map(([k, v]) => `${k} = ${v.kind === 'tag' ? v.name : v.kind === 'const' ? v.value : v.kind === 'self' ? '(diese Variable)' : ''}`)
       .join(', ');
-    return { code: `// TODO ${e.name}(${args})`, onEventOnly: false };
+    return { code: `// TODO ${e.name}(${args})` };
   };
   if (e.type && e.type !== 'SystemFunction') return fail(`Typ „${e.type}“ (z. B. VB-Skript) wird nicht automatisch übersetzt`);
 
@@ -274,14 +271,12 @@ function statement(e: FunctionEntry, ctx: Ctx, dataTypes: Map<string, string>): 
     case 'ActivateScreen': {
       const screen = p('Screen name');
       const name = screen?.kind === 'tag' ? screen.name : screen?.kind === 'const' ? screen.value : '';
-      if (!name) return fail('Bildname fehlt');
-      return { code: `HMIRuntime.UI.SysFct.ChangeScreen(${js(name)}, ".");`, onEventOnly: true };
+      return { screen: name ? `Bild „${name}“` : 'Bild (ohne Namen)' };
     }
     case 'ActivateScreenByNumber': {
-      const number = expr(p('Screen number'), ctx);
-      if (number === null) return fail('Bildnummer fehlt');
-      ctx.screensByNumber = true;
-      return { code: `if (ev === 2 && TagEventScreens[${number}]) HMIRuntime.UI.SysFct.ChangeScreen(TagEventScreens[${number}], ".");`, onEventOnly: false };
+      const number = p('Screen number');
+      const which = number?.kind === 'self' ? 'Bildnummer = Wert der Variable' : number?.kind === 'tag' ? `Bildnummer aus „${number.name}“` : number?.kind === 'const' ? `Bildnummer ${number.value}` : 'Bildnummer';
+      return { screen: `${which} (ActivateScreenByNumber)` };
     }
     default:
       return fail('Systemfunktion ohne automatisches Gegenstück');
@@ -294,6 +289,10 @@ export interface ScriptStats {
   handlers: number;
   statements: number;
   todos: number;
+  /** Screen changes left out of the script. */
+  screens: number;
+  /** Events that consisted of screen changes only and therefore have no function in the script. */
+  screenOnly: number;
 }
 
 export function buildScriptFromTags(tags: AdvancedTag[], log: NoticeLog, source: string): { script: string; stats: ScriptStats } {
@@ -302,17 +301,16 @@ export function buildScriptFromTags(tags: AdvancedTag[], log: NoticeLog, source:
   const usedNames = new Set<string>();
   const fns: string[][] = [];
   const calls: string[] = [];
-  const stats: ScriptStats = { tags: tags.length, withEvents: 0, handlers: 0, statements: 0, todos: 0 };
-  let screensByNumber = false;
+  const stats: ScriptStats = { tags: tags.length, withEvents: 0, handlers: 0, statements: 0, todos: 0, screens: 0, screenOnly: 0 };
 
   const sorted = [...tags].sort((a, b) => a.name.localeCompare(b.name, 'de'));
   for (const tag of sorted) {
     const events = tag.events.filter((e) => e.entries.length);
     if (!events.length) continue;
-    stats.withEvents++;
     const self = unifiedName(tag.name);
+    let emitted = false;
     for (const ev of events) {
-      const ctx: Ctx = { self, known, log, where: tag.source.split('/').pop() ?? tag.source, screensByNumber: false, written: new Map() };
+      const ctx: Ctx = { self, known, log, where: tag.source.split('/').pop() ?? tag.source, written: new Map() };
       const label = EVENT_LABEL[ev.kind];
       if (!label) {
         log.warn(`Ereignis „${ev.kind}“ an „${tag.name}“ wird nicht unterstützt und fehlt im Skript.`, ctx.where);
@@ -327,8 +325,24 @@ export function buildScriptFromTags(tags: AdvancedTag[], log: NoticeLog, source:
         }
         condition = `value ${ev.kind === 'AboveUpperLimit' ? '>' : '<'} ${limit}`;
       }
-      const statements = ev.entries.map((e) => statement(e, ctx, dataTypes)).filter((s): s is Statement => !!s);
-      screensByNumber ||= ctx.screensByNumber;
+      const statements: string[] = [];
+      for (const s of ev.entries.map((e) => statement(e, ctx, dataTypes))) {
+        if (!s) continue;
+        if ('code' in s) {
+          statements.push(s.code);
+          continue;
+        }
+        stats.screens++;
+        log.warn(
+          `Bildwechsel nicht übernommen: „${tag.name}“ (${label}) → ${s.screen}. Aus einem zyklischen Skript ist kein Bildwechsel möglich – bitte in Unified anders lösen.`,
+          ctx.where,
+        );
+      }
+      if (!statements.length) {
+        stats.screenOnly++;
+        continue;
+      }
+      emitted = true;
 
       let fnName = functionName(self) + (ev.kind === 'ChangeValue' ? '' : ev.kind === 'AboveUpperLimit' ? '_Ueber' : '_Unter');
       for (let n = 2; usedNames.has(fnName); n++) fnName = `${fnName}_${n}`;
@@ -340,15 +354,16 @@ export function buildScriptFromTags(tags: AdvancedTag[], log: NoticeLog, source:
       lines.push(`${INDENT}${INDENT}var value = ${get(self)};`);
       lines.push(`${INDENT}${INDENT}var ev = TagEventCheck(${js(key)}, ${condition || 'value'});`);
       lines.push(`${INDENT}${INDENT}if (!ev${condition ? ` || !(${condition})` : ''}) return;`);
-      for (const s of statements) {
-        if (s.code.startsWith('// TODO')) stats.todos++;
-        lines.push(`${INDENT}${INDENT}${s.onEventOnly ? `if (ev === 2) ${s.code}` : s.code}`);
+      for (const code of statements) {
+        if (code.startsWith('// TODO')) stats.todos++;
+        lines.push(`${INDENT}${INDENT}${code}`);
         stats.statements++;
       }
       lines.push(`${INDENT}}`);
       fns.push(lines);
       stats.handlers++;
     }
+    if (emitted) stats.withEvents++;
   }
 
   const out: string[] = [
@@ -362,12 +377,8 @@ export function buildScriptFromTags(tags: AdvancedTag[], log: NoticeLog, source:
     '',
     'export function TagEvent(parameter1, parameter2) {',
   ];
-  if (screensByNumber) {
-    out.push(`${INDENT}// Bildnummern aus WinCC Advanced – Unified kennt keine Bildnummern. Bitte Nummer und Bildname eintragen, z. B. 1010: "Uebersicht".`);
-    out.push(`${INDENT}var TagEventScreens = {`);
-    out.push(`${INDENT}};`);
-    out.push('');
-    log.warn('ActivateScreenByNumber: Unified kennt keine Bildnummern. Im Skript oben in „TagEventScreens“ die Zuordnung Bildnummer → Bildname eintragen.');
+  if (stats.screens) {
+    out.splice(3, 0, `// Bildwechsel aus Advanced (${stats.screens}) sind nicht enthalten – sie sind im Converter als Hinweise aufgelistet.`);
   }
   out.push(...calls, '');
   out.push(`${INDENT}// 0 = nichts zu tun, 1 = erster Aufruf nach dem Start, 2 = Ereignis eingetreten`);
@@ -387,7 +398,11 @@ export async function convertAdvancedEvents(input: ArrayBuffer | Uint8Array, fil
   const tags = await readAdvancedTags(input, fileName, log);
   const { script, stats } = buildScriptFromTags(tags, log, fileName);
   if (!stats.handlers) {
-    throw new ConversionError(`In den ${tags.length} Variablen ist kein Ereignis mit Funktionsliste hinterlegt – es gibt nichts umzusetzen.`);
+    throw new ConversionError(
+      stats.screens
+        ? `Die Ereignisse in den ${tags.length} Variablen bestehen nur aus Bildwechseln. Die sind aus einem zyklischen Skript nicht möglich – es gibt kein Skript.`
+        : `In den ${tags.length} Variablen ist kein Ereignis mit Funktionsliste hinterlegt – es gibt nichts umzusetzen.`,
+    );
   }
   return {
     data: new TextEncoder().encode(script),
@@ -396,6 +411,7 @@ export async function convertAdvancedEvents(input: ArrayBuffer | Uint8Array, fil
     notices: log.items,
     summary:
       `Skript erstellt: ${stats.handlers} Ereignisse an ${stats.withEvents} von ${stats.tags} Variablen, ${stats.statements} Anweisungen` +
-      (stats.todos ? `, davon ${stats.todos} zum manuellen Nacharbeiten.` : '.'),
+      (stats.todos ? `, davon ${stats.todos} zum manuellen Nacharbeiten` : '') +
+      (stats.screens ? `. ${stats.screens} Bildwechsel nicht übernommen (siehe Hinweise).` : '.'),
   };
 }

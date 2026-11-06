@@ -4,6 +4,17 @@ Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Das Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 die Versionierung folgt [Semantic Versioning](https://semver.org/lang/de/).
 
+## [1.4.1] - 2026-11-06
+
+### Geändert
+
+- **Variablen-Ereignisse: keine Bildwechsel mehr im Skript.** Aus einem zyklisch laufenden Hintergrund-Skript ist
+  in WinCC Unified kein Bildwechsel möglich. `ActivateScreen` und `ActivateScreenByNumber` werden deshalb nicht mehr
+  als `ChangeScreen` übernommen, sondern als Hinweis mit Variable, Ereignis und Bild aufgelistet. Ereignisse, die nur
+  aus Bildwechseln bestanden, erzeugen keine leere Funktion mehr. Die Bildnummern-Tabelle entfällt.
+- In der Ereignis-Vorlage gibt es die Aktion „Bild wechseln“ nicht mehr; Skript-Zeilen mit `ChangeScreen` werden mit
+  Hinweis übersprungen.
+
 ## [1.4.0] - 2026-11-02
 
 ### Neu
@@ -91,6 +102,7 @@ Unified Migration Tools, die vollständig im Browser läuft.
 - Responsives Design im hellen und dunklen Modus (PRH Design Kit)
 - Automatisierte Tests für alle Umwandlungsregeln
 
+[1.4.1]: https://github.com/paul-rafael/wincc-unified-list-converter/releases/tag/v1.4.1
 [1.4.0]: https://github.com/paul-rafael/wincc-unified-list-converter/releases/tag/v1.4.0
 [1.3.0]: https://github.com/paul-rafael/wincc-unified-list-converter/releases/tag/v1.3.0
 [1.2.0]: https://github.com/paul-rafael/wincc-unified-list-converter/releases/tag/v1.2.0
