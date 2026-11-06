@@ -21,7 +21,9 @@ export const EVENTS_SHEET = 'Ereignisse';
 export const TAGS_SHEET = 'Variablen';
 
 export const EVENTS = ['Wertänderung', 'Überschreitung', 'Unterschreitung'] as const;
-export const ACTIONS = ['Variable setzen', 'Bild wechseln', 'Skript'] as const;
+export const ACTIONS = ['Variable setzen', 'Skript'] as const;
+// A cyclic background script has no screen: screen changes cannot be part of it.
+const SCREEN_CHANGE_RE = /ChangeScreen|ActivateScreen/i;
 type EventKind = (typeof EVENTS)[number];
 type ActionKind = (typeof ACTIONS)[number];
 
@@ -121,8 +123,8 @@ export async function buildEventTemplate(wb: Workbook): Promise<{ data: Uint8Arr
     'Trigger-Variable – Variable, an der das Ereignis hing.',
     'Ereignis – Wertänderung, Überschreitung oder Unterschreitung.',
     'Grenzwert – nur bei Über-/Unterschreitung: Zahl oder Name einer Variable.',
-    'Aktion – Variable setzen, Bild wechseln oder Skript.',
-    'Ziel – bei „Variable setzen“ die Zielvariable, bei „Bild wechseln“ der Bildname.',
+    'Aktion – Variable setzen oder Skript. Bildwechsel sind aus einem zyklischen Skript nicht möglich und werden nicht übernommen.',
+    'Ziel – bei „Variable setzen“ die Zielvariable.',
     'Wert / Formel – Zahl, true/false, "Text" oder Formel. {Trigger} steht für den Wert der Trigger-Variable, {Variablenname} für den Wert einer anderen Variable.',
     '    Beispiele: 1010   |   {Trigger} + 12   |   10000 * {12V_CCS_ModStat_PlcNo} + {12V_CCS_ModStat_RunNo}',
     '    Bei „Skript“: JavaScript-Code, ebenfalls mit {Trigger} und {Variablenname}.',
@@ -189,6 +191,10 @@ function readRows(ws: Sheet, log: NoticeLog): EventRow[] {
       continue;
     }
     const action = ACTIONS.find((a) => a.toLowerCase() === actionText.toLowerCase());
+    if (/^bild/i.test(actionText) || (action === 'Skript' && SCREEN_CHANGE_RE.test(cell(7)))) {
+      log.warn('Bildwechsel sind aus einem zyklischen Skript nicht möglich – Zeile nicht übernommen, bitte in Unified anders lösen.', where(r, action ? 7 : 5));
+      continue;
+    }
     if (!action) {
       log.warn(`Unbekannte Aktion „${actionText}“ – erlaubt: ${ACTIONS.join(', ')}. Zeile übersprungen.`, where(r, 5));
       continue;
@@ -292,7 +298,7 @@ export function buildEventScript(rows: EventRow[], knownTags: Set<string> | null
       }
       cond = `${local(fn, e.trigger)} ${e.event === 'Überschreitung' ? '>' : '<'} ${limit}`;
     }
-    // Setting a tag every cycle is harmless; a screen change or script must only run when the event occurs.
+    // Setting a tag every cycle is harmless; a script must only run when the event occurs.
     if (e.action !== 'Variable setzen') {
       edgeDetection = true;
       if (cond) cond = `TagEventChanged(${js(cond.replace(local(fn, e.trigger), e.trigger))}, ${cond}) && ${cond}`;
@@ -305,9 +311,7 @@ export function buildEventScript(rows: EventRow[], knownTags: Set<string> | null
 
     const refs: string[] = [];
     let line: string;
-    if (e.action === 'Bild wechseln') {
-      line = `HMIRuntime.UI.SysFct.ChangeScreen(${js(e.target)}, ".");`;
-    } else if (e.action === 'Skript') {
+    if (e.action === 'Skript') {
       line = substitute(e.value, fn, e.trigger, refs);
     } else {
       check(e.target, e.row, 6);
@@ -338,7 +342,7 @@ export function buildEventScript(rows: EventRow[], knownTags: Set<string> | null
   if (edgeDetection) {
     out.push('');
     out.push('// Globale Definition – in WinCC Unified in den Bereich „Globale Definitionen“ des Skriptmoduls übernehmen.');
-    out.push('// Merkt sich die letzten Werte, damit Bildwechsel und Skripte nur beim Ereignis selbst laufen.');
+    out.push('// Merkt sich die letzten Werte, damit Skripte nur beim Ereignis selbst laufen.');
     out.push('var TagEventLast = {};');
     out.push('');
   }
@@ -378,7 +382,7 @@ export function buildEventScript(rows: EventRow[], knownTags: Set<string> | null
   out.push('}');
   out.push('');
   if (edgeDetection) {
-    log.info('Bildwechsel und Skripte laufen nur, wenn das Ereignis eintritt. Dafür steht oben im Skript die Zeile „var TagEventLast = {};“ – sie gehört in die globalen Definitionen des Skriptmoduls.');
+    log.info('Skripte laufen nur, wenn das Ereignis eintritt. Dafür steht oben im Skript die Zeile „var TagEventLast = {};“ – sie gehört in die globalen Definitionen des Skriptmoduls.');
   }
   return { script: out.join('\n'), functions: used.length, actions };
 }

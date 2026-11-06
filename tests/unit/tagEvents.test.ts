@@ -57,32 +57,30 @@ describe('Variablen-Ereignisse', () => {
       { name: 'Variablen', rows: { 1: { A: 'Name' }, 2: { A: 'Pu_Adr' }, 3: { A: 'Pu_Pl1' }, 4: { A: 'Lacs_0' }, 5: { A: 'Pic_1' }, 6: { A: 'Plc' }, 7: { A: 'ModNo' }, 8: { A: 'Err' } } },
     ]);
 
-  it('generates a script that sets tags, respects limits and changes screens only on change', async () => {
+  it('generates a script that sets tags and respects limits, without screen changes', async () => {
     const input = await filled({
       2: { A: 'Pu', B: 'Pu_Adr', C: 'Wertänderung', E: 'Variable setzen', F: 'Pu_Pl1', G: '{Trigger} + 78' },
       3: { A: 'Mod', B: 'Pu_Adr', C: 'Wertänderung', E: 'Variable setzen', F: 'ModNo', G: '10000 * {Plc} + {Trigger}' },
       4: { A: 'Lacs', B: 'Lacs_0', C: 'Überschreitung', D: 8, E: 'Variable setzen', F: 'Pic_1', G: 1011 },
       5: { A: 'Err', B: 'Err', C: 'Wertänderung', E: 'Bild wechseln', F: '2_error_0' },
       6: { B: 'Lacs_0', C: 'Überschreitung', D: 8 },
+      7: { A: 'Err', B: 'Err', C: 'Wertänderung', E: 'Skript', G: 'HMIRuntime.UI.SysFct.ChangeScreen("x", ".");' },
     });
     const res = await convertTagEvents(input, 'TagEvents.xlsx');
     expect(res.fileName).toBe('TagEvent.js');
-    expect(res.summary).toMatch(/4 Funktionen mit 4 Aktionen/);
+    expect(res.summary).toMatch(/3 Funktionen mit 3 Aktionen/);
     const script = new TextDecoder().decode(res.data);
-    expect(script).toContain('var TagEventLast = {};');
+    expect(script).not.toMatch(/ChangeScreen/);
+    expect(res.notices.filter((n) => /Bildwechsel/.test(n.text)).map((n) => n.cell)).toEqual(['Ereignisse!E5', 'Ereignisse!G7']);
 
     const tags: Record<string, unknown> = { Pu_Adr: 100, Plc: 2, Lacs_0: 8, Err: 1 };
     const sim = runScript(script, tags);
     sim.call();
     expect(sim.writes).toEqual({ Pu_Pl1: 178, ModNo: 20100 });
-    expect(sim.screens).toEqual([]);
     tags.Lacs_0 = 9;
-    tags.Err = 2;
     sim.call();
     expect(sim.writes.Pic_1).toBe(1011);
-    expect(sim.screens).toEqual(['2_error_0']);
-    sim.call();
-    expect(sim.screens).toHaveLength(1);
+    expect(sim.screens).toEqual([]);
   });
 
   it('reports unknown tags, invalid formulas and unknown events with their cell', async () => {

@@ -216,8 +216,9 @@
               <ul>
                 <li>Eine Funktion pro Ereignis; mehrere Ereignisse und Funktionslisten-Einträge pro Variable werden übernommen.</li>
                 <li><em>Wertänderung</em> läuft nur, wenn sich der Wert ändert; <em>Überschreitung</em> nur beim Überschreiten des Grenzwerts aus der Variable.</li>
-                <li>Nach dem Start werden Berechnungen einmal ausgeführt, damit abhängige Variablen stimmen; Bildwechsel nicht.</li>
-                <li>Umgesetzt: <code>SetTag</code>, <code>LinearScaling</code>, <code>InvertLinearScaling</code>, <code>SetBit</code>, <code>ResetBit</code>, <code>InvertBit</code>, <code>IncreaseValue</code>, <code>DecreaseValue</code>, <code>ActivateScreen</code>, <code>ActivateScreenByNumber</code> (mit Bildnummern-Tabelle). Andere Funktionen erscheinen als <code>// TODO</code> mit Hinweis.</li>
+                <li>Nach dem Start werden die Funktionslisten einmal ausgeführt, damit abhängige Variablen stimmen.</li>
+                <li>Umgesetzt: <code>SetTag</code>, <code>LinearScaling</code>, <code>InvertLinearScaling</code>, <code>SetBit</code>, <code>ResetBit</code>, <code>InvertBit</code>, <code>IncreaseValue</code>, <code>DecreaseValue</code>. Andere Funktionen erscheinen als <code>// TODO</code> mit Hinweis.</li>
+                <li><strong>Bildwechsel</strong> (<code>ActivateScreen</code>, <code>ActivateScreenByNumber</code>) sind aus einem zyklischen Skript nicht möglich: Sie kommen nicht ins Skript, sondern werden als Hinweis mit Variable, Ereignis und Bild aufgelistet.</li>
                 <li>Variablennamen werden wie bei <em>HMI-Variablen</em> übersetzt (<code>12V_CCS\HmiSc\AdrNoScan</code> → <code>12V_CCS_HmiSc_AdrNoScan</code>).</li>
                 <li>Eingabe: <code>.zip</code>, <code>.xml</code> (oder <code>.xlsx</code>) · Ergebnis: <code>TagEvent.js</code> zum Kopieren</li>
               </ul>

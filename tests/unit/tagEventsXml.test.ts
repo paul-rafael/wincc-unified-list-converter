@@ -44,6 +44,7 @@ const files = {
   lacs: tagXml('Line\\Lacs_0', [event('AboveUpperLimit', entry('SetTag', ['Tag', { tag: '"Line\\Pic.No"' }], ['Value', 1011]), entry('ActivateScreen', ['Screen name', { tag: '2_error_0' }], ['Object number', 0]))], '<LimitUpper2>8</LimitUpper2>'),
   pic: tagXml('Line\\Pic.No'),
   vis: tagXml('Line\\Vis', [], '', 'Bool'),
+  err: tagXml('Line\\Err', [event('ChangeValue', entry('ActivateScreen', ['Screen name', { tag: '2_error_0' }], ['Object number', 0]))]),
   mux: tagXml('Line\\Mux', [event('ChangeValue', entry('SetBit', ['Tag', { tag: 'Line\\Vis' }]), entry('ActivateScreenByNumber', ['Screen number', '#self'], ['Object number', 0]), entry('StopRuntime'))]),
 };
 
@@ -66,8 +67,12 @@ describe('Variablen-Ereignisse aus dem Openness-Export', () => {
     const res = await convertTagEvents(await exportZip(files), 'Export.zip');
     expect(res.fileName).toBe('TagEvent.js');
     expect(res.text).toBe(new TextDecoder().decode(res.data));
-    expect(res.summary).toMatch(/3 Ereignisse an 3 von 7 Variablen, 7 Anweisungen, davon 1 zum manuellen/);
+    expect(res.summary).toMatch(/3 Ereignisse an 3 von 8 Variablen, 5 Anweisungen, davon 1 zum manuellen Nacharbeiten\. 3 Bildwechsel nicht übernommen/);
     const script = res.text!;
+    // a cyclic background script cannot change screens: nothing of it may end up in the script
+    expect(script).not.toMatch(/ChangeScreen|TagEventScreens/);
+    expect(script).not.toContain('function Err()'); // event with screen changes only
+    expect(script).toContain('SetTagValue("Line_Pic_No", 1011)');
     expect(script).toContain('SetTagValue("Line_Sc_AdrA", value + 12)');
     // the value computed in the same function list is used instead of reading the tag back
     expect(script).toContain('SetTagValue("Line_Sc_AdrB", 2 * (value + 12) - 4)');
@@ -80,20 +85,24 @@ describe('Variablen-Ereignisse aus dem Openness-Export', () => {
     expect(s.tags.Line_Sc_AdrA).toBe(112); // first call initialises derived tags
     expect(s.tags.Line_Sc_AdrB).toBe(220);
     expect(s.tags.Line_Vis).toBe(true); // SetBit on a Bool tag
-    expect(s.screens).toEqual([]);
+    expect(s.tags.Line_Pic_No).toBeUndefined(); // 5 is not above 8
     s.tags.Line_Sc_AdrA = 0;
     s.run();
     expect(s.tags.Line_Sc_AdrA).toBe(0); // no change, no event
     s.tags.Line_Lacs_0 = 9;
     s.run();
     expect(s.tags.Line_Pic_No).toBe(1011);
-    expect(s.screens).toEqual(['2_error_0']);
+    s.tags.Line_Pic_No = 0;
     s.tags.Line_Lacs_0 = 10;
     s.run();
-    expect(s.screens).toHaveLength(1); // still above the limit: no new event
+    expect(s.tags.Line_Pic_No).toBe(0); // still above the limit: no new event
+    expect(s.screens).toEqual([]);
 
     expect(res.notices.some((n) => /StopRuntime/.test(n.text))).toBe(true);
-    expect(res.notices.some((n) => /Bildnummern/.test(n.text))).toBe(true);
+    const screenNotes = res.notices.filter((n) => /Bildwechsel nicht übernommen/.test(n.text)).map((n) => n.text);
+    expect(screenNotes).toHaveLength(3);
+    expect(screenNotes.join('\n')).toMatch(/Line\\Lacs_0“ \(Überschreitung\) → Bild „2_error_0“/);
+    expect(screenNotes.join('\n')).toMatch(/Line\\Mux“ \(Wertänderung\) → Bildnummer = Wert der Variable/);
   });
 
   it('warns about an incomplete export and unknown tags', async () => {
@@ -106,6 +115,7 @@ describe('Variablen-Ereignisse aus dem Openness-Export', () => {
   it('accepts a single tag XML and stops when nothing has an event', async () => {
     const one = await convertTagEvents(new TextEncoder().encode(files.lacs), 'lacs.xml');
     expect(one.summary).toMatch(/1 Ereignisse an 1 von 1/);
+    await expect(convertTagEvents(await exportZip({ err: files.err }), 'E.zip')).rejects.toThrow(/nur aus Bildwechseln/);
     await expect(convertTagEvents(await exportZip({ a: files.adrA }), 'E.zip')).rejects.toThrow(/kein Ereignis/);
     await expect(convertTagEvents(await exportZip({}), 'E.zip')).rejects.toThrow(/Keine HMI-Variablen/);
   });
