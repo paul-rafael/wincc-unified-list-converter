@@ -3,7 +3,7 @@
  * Paul-Rafael Hasan-Man
  *
  * Gemeinsamer Stil für alle Projekte: elegant, zurückhaltend, Schwarz/Weiß mit
- * dunkelroten Akzenten. Heller und dunkler Modus folgen automatisch
+ * neutralen Akzenten (Schwarz, Weiß, Hellgrau). Heller und dunkler Modus folgen automatisch
  * der Systemeinstellung; erzwingen mit <html data-theme="light|dark">.
  *
  * Aufbau:
@@ -26,14 +26,19 @@
   --pr-text-2: #4b4b4b;
   --pr-text-3: #8a8a8a;
 
-  /* Akzent 1 · Dunkelrot (Hauptaktionen, Auswahl, Hervorhebung) */
-  --pr-red: #8a0b18;
-  --pr-red-hover: #6d0812;
-  --pr-red-text: #8a0b18;
-  --pr-red-soft: #f9ecee;
-  --pr-red-ring: rgba(138, 11, 24, 0.16);
+  /* Akzent · neutral: Schwarz (im Dunkelmodus Weiß) – Hauptaktionen, Auswahl, Hervorhebung */
+  --pr-accent: #121212;
+  --pr-accent-hover: #333333;
+  --pr-accent-text: #121212;
+  --pr-accent-soft: #f2f2f2;
+  --pr-accent-ring: rgba(18, 18, 18, 0.14);
 
-  /* Akzent 2 · Schwarz (im Dunkelmodus Weiß): Nummern, Symbole, Info, Zweit-Buttons */
+  /* Signal · gedämpftes Rot, ausschließlich für Fehler und Warnungen */
+  --pr-signal: #8a0b18;
+  --pr-signal-text: #8a0b18;
+  --pr-signal-soft: #f9ecee;
+
+  /* Ink · Schwarz (im Dunkelmodus Weiß): Nummern, Symbole, Info, Zweit-Buttons */
   --pr-ink: #121212;
   --pr-ink-soft: #f4f4f4;
   --pr-ink-ring: rgba(18, 18, 18, 0.14);
@@ -69,11 +74,15 @@
     --pr-text: #f0f0f0;
     --pr-text-2: #b5b5b5;
     --pr-text-3: #7f7f7f;
-    --pr-red: #9a0e1b;
-    --pr-red-hover: #b31220;
-    --pr-red-text: #c7232f;
-    --pr-red-soft: #1b0608;
-    --pr-red-ring: rgba(199, 35, 47, 0.25);
+    --pr-accent: #f0f0f0;
+    --pr-accent-hover: #ffffff;
+    --pr-accent-text: #f0f0f0;
+    --pr-accent-soft: #1c1c1c;
+    --pr-accent-ring: rgba(240, 240, 240, 0.2);
+    --pr-on-accent: #0a0a0a;
+    --pr-signal: #9a0e1b;
+    --pr-signal-text: #c7232f;
+    --pr-signal-soft: #1b0608;
     --pr-ink: #f0f0f0;
     --pr-ink-soft: #171717;
     --pr-ink-ring: rgba(240, 240, 240, 0.18);
@@ -93,11 +102,15 @@
   --pr-text: #f0f0f0;
   --pr-text-2: #b5b5b5;
   --pr-text-3: #7f7f7f;
-  --pr-red: #9a0e1b;
-  --pr-red-hover: #b31220;
-  --pr-red-text: #c7232f;
-  --pr-red-soft: #1b0608;
-  --pr-red-ring: rgba(199, 35, 47, 0.25);
+  --pr-accent: #f0f0f0;
+  --pr-accent-hover: #ffffff;
+  --pr-accent-text: #f0f0f0;
+  --pr-accent-soft: #1c1c1c;
+  --pr-accent-ring: rgba(240, 240, 240, 0.2);
+  --pr-on-accent: #0a0a0a;
+  --pr-signal: #9a0e1b;
+  --pr-signal-text: #c7232f;
+  --pr-signal-soft: #1b0608;
   --pr-ink: #f0f0f0;
   --pr-ink-soft: #171717;
   --pr-ink-ring: rgba(240, 240, 240, 0.18);
@@ -121,14 +134,14 @@ body {
 }
 h1, h2, h3, h4 { margin: 0; line-height: 1.2; font-weight: 600; letter-spacing: -0.015em; }
 p { margin: 0; }
-a { color: var(--pr-red-text); text-underline-offset: 3px; }
-a:hover { color: var(--pr-red-hover); }
+a { color: var(--pr-accent-text); text-underline-offset: 3px; }
+a:hover { color: var(--pr-accent-hover); }
 code, kbd, pre { font-family: var(--pr-mono); font-size: 0.86em; }
 code { background: var(--pr-code-bg); padding: 0.1em 0.38em; border-radius: 4px; }
 pre { background: var(--pr-code-bg); padding: 14px 16px; border-radius: var(--pr-radius); overflow: auto; }
 pre code { background: none; padding: 0; }
 kbd { border: 1px solid var(--pr-border-strong); border-bottom-width: 2px; border-radius: 4px; padding: 0 0.35em; background: var(--pr-surface); }
-::selection { background: var(--pr-red-soft); color: var(--pr-text); }
+::selection { background: var(--pr-accent-soft); color: var(--pr-text); }
 :focus-visible { outline: 2px solid var(--pr-ink); outline-offset: 2px; }
 
 /* ------------------------------------------------------------------ 3. Bausteine */
@@ -150,16 +163,16 @@ kbd { border: 1px solid var(--pr-border-strong); border-bottom-width: 2px; borde
 
 /* Überschriftenbereich */
 .pr-hero { padding: 80px 0 48px; text-align: center; max-width: 780px; margin: 0 auto; }
-.pr-eyebrow { display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.16em; color: var(--pr-red-text); margin-bottom: 16px; }
+.pr-eyebrow { display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.16em; color: var(--pr-text-3); margin-bottom: 16px; }
 .pr-title { font-size: clamp(30px, 4.4vw, 46px); font-weight: 600; letter-spacing: -0.03em; }
-.pr-title em { font-style: normal; color: var(--pr-red-text); }
+.pr-title em { font-style: normal; color: var(--pr-text-3); }
 .pr-lead { margin-top: 20px; font-size: 17px; color: var(--pr-text-2); }
 .pr-section-title { font-size: clamp(24px, 3.2vw, 32px); letter-spacing: -0.025em; }
 
 /* Buttons */
 .pr-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 22px; border-radius: 8px; border: 1px solid transparent; font: inherit; font-weight: 600; font-size: 15px; cursor: pointer; text-decoration: none; transition: background 0.2s, border-color 0.2s, color 0.2s, opacity 0.2s; }
-.pr-btn-primary { background: var(--pr-red); color: var(--pr-on-accent); }
-.pr-btn-primary:hover { background: var(--pr-red-hover); color: var(--pr-on-accent); }
+.pr-btn-primary { background: var(--pr-accent); color: var(--pr-on-accent); }
+.pr-btn-primary:hover { background: var(--pr-accent-hover); color: var(--pr-on-accent); }
 .pr-btn-secondary { background: var(--pr-ink); color: var(--pr-on-ink); }
 .pr-btn-secondary:hover { background: color-mix(in srgb, var(--pr-ink) 82%, var(--pr-bg)); color: var(--pr-on-ink); }
 .pr-btn-ghost { background: transparent; border-color: var(--pr-border-strong); color: var(--pr-text); }
@@ -174,7 +187,7 @@ kbd { border: 1px solid var(--pr-border-strong); border-bottom-width: 2px; borde
 .pr-panel { background: var(--pr-surface); border: 1px solid var(--pr-border); border-radius: var(--pr-radius-lg); box-shadow: var(--pr-shadow); padding: 32px; }
 .pr-card-select { cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s; }
 .pr-card-select:hover { border-color: var(--pr-border-strong); }
-.pr-card-select[aria-selected='true'], .pr-card-select:has(input:checked) { border-color: var(--pr-red); box-shadow: 0 0 0 3px var(--pr-red-ring); }
+.pr-card-select[aria-selected='true'], .pr-card-select:has(input:checked) { border-color: var(--pr-accent); box-shadow: 0 0 0 3px var(--pr-accent-ring); }
 
 /* Kleine Elemente */
 .pr-chip { display: inline-block; font-family: var(--pr-mono); font-size: 11px; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--pr-border); color: var(--pr-text-3); }
@@ -185,22 +198,22 @@ kbd { border: 1px solid var(--pr-border-strong); border-bottom-width: 2px; borde
 
 /* Hinweise */
 .pr-note { padding: 12px 16px; border-radius: var(--pr-radius-sm); border-left: 2px solid var(--pr-ink); background: var(--pr-ink-soft); font-size: 14.5px; }
-.pr-note-accent { border-left-color: var(--pr-red); background: var(--pr-red-soft); }
-.pr-alert { display: flex; gap: 12px; padding: 16px 18px; border-radius: var(--pr-radius); border: 1px solid color-mix(in srgb, var(--pr-red) 45%, transparent); background: var(--pr-red-soft); }
+.pr-note-accent { border-left-color: var(--pr-signal); background: var(--pr-signal-soft); }
+.pr-alert { display: flex; gap: 12px; padding: 16px 18px; border-radius: var(--pr-radius); border: 1px solid color-mix(in srgb, var(--pr-signal) 45%, transparent); background: var(--pr-signal-soft); }
 .pr-success { display: flex; gap: 12px; padding: 16px 18px; border-radius: var(--pr-radius); border: 1px solid var(--pr-border); background: var(--pr-surface-2); }
 
 /* Tabs */
 .pr-tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--pr-border); overflow-x: auto; }
 .pr-tab { padding: 11px 14px; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px; background: none; color: var(--pr-text-3); font: inherit; font-size: 14.5px; font-weight: 500; cursor: pointer; white-space: nowrap; }
 .pr-tab:hover { color: var(--pr-text); }
-.pr-tab[aria-selected='true'], .pr-tab.active { color: var(--pr-text); border-bottom-color: var(--pr-red); }
+.pr-tab[aria-selected='true'], .pr-tab.active { color: var(--pr-text); border-bottom-color: var(--pr-accent); }
 
 /* Formulare */
 .pr-label { display: block; font-size: 13.5px; font-weight: 600; margin-bottom: 6px; }
 .pr-input, .pr-select, .pr-textarea { width: 100%; font: inherit; font-size: 15px; color: var(--pr-text); background: var(--pr-surface); border: 1px solid var(--pr-border-strong); border-radius: 8px; padding: 10px 12px; transition: border-color 0.2s, box-shadow 0.2s; }
 .pr-input:focus, .pr-select:focus, .pr-textarea:focus { outline: none; border-color: var(--pr-ink); box-shadow: 0 0 0 3px var(--pr-ink-ring); }
 .pr-dropzone { display: grid; place-items: center; gap: 6px; padding: 44px 20px; border: 1px dashed var(--pr-border-strong); border-radius: var(--pr-radius); background: var(--pr-surface-2); text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
-.pr-dropzone:hover, .pr-dropzone.is-dragging { border-color: var(--pr-red); background: var(--pr-red-soft); }
+.pr-dropzone:hover, .pr-dropzone.is-dragging { border-color: var(--pr-accent); background: var(--pr-accent-soft); }
 
 /* Tabellen */
 .pr-table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
@@ -211,7 +224,7 @@ kbd { border: 1px solid var(--pr-border-strong); border-bottom-width: 2px; borde
 .pr-footer { border-top: 1px solid var(--pr-border); padding: 28px 0 32px; color: var(--pr-text-3); font-size: 13px; }
 .pr-footer-inner { display: flex; justify-content: space-between; align-items: center; gap: 12px 24px; flex-wrap: wrap; }
 .pr-footer a { color: var(--pr-text-2); }
-.pr-footer a:hover { color: var(--pr-red-text); }
+.pr-footer a:hover { color: var(--pr-accent-text); }
 .pr-signature { display: inline-flex; align-items: center; gap: 10px; color: var(--pr-text-3); text-decoration: none; font-size: 12px; letter-spacing: 0.02em; }
 .pr-signature .pr-logo { height: 22px; opacity: 0.55; transition: opacity 0.2s; }
 .pr-signature:hover { color: var(--pr-text); }

@@ -4,6 +4,14 @@ Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Das Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 die Versionierung folgt [Semantic Versioning](https://semver.org/lang/de/).
 
+## [1.5.0] - 2026-11-10
+
+### Geändert
+
+- **Neutrales Design.** Der dunkelrote Akzent entfällt: Hauptbuttons, Auswahl, Links und Reiter sind jetzt Schwarz
+  (im Dunkelmodus Weiß) mit hellgrauen Flächen. Rot bleibt als gedämpftes Signal ausschließlich für Fehler und
+  Warnungen. Das Design-Kit in `brand/` (Version 1.1) nennt die Variablen `--pr-accent…` und `--pr-signal…`.
+
 ## [1.4.1] - 2026-11-06
 
 ### Geändert

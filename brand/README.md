@@ -1,6 +1,6 @@
 # PRH Design Kit
 
-Gemeinsamer Stil für alle Projekte von Paul-Rafael Hasan-Man: elegant und zurückhaltend, Schwarz/Weiß mit dunkelroten Akzenten. Heller und dunkler Modus funktionieren automatisch.
+Gemeinsamer Stil für alle Projekte von Paul-Rafael Hasan-Man: elegant und zurückhaltend, Schwarz/Weiß mit neutralen Akzenten (Schwarz, Weiß, Hellgrau). Heller und dunkler Modus funktionieren automatisch.
 
 | Datei | Zweck |
 |---|---|
@@ -39,11 +39,12 @@ Immer über die Variablen verwenden, nie Farbwerte direkt eintragen – dann sti
 | `--pr-bg`, `--pr-surface`, `--pr-surface-2` | Hintergrund, Karten, leicht abgesetzte Flächen |
 | `--pr-text`, `--pr-text-2`, `--pr-text-3` | Text: Haupttext, Fließtext, Nebeninfos |
 | `--pr-border`, `--pr-border-strong` | Rahmen und Trennlinien |
-| `--pr-red`, `--pr-red-hover` | Hauptaktionen (Buttons), Auswahl |
-| `--pr-red-text`, `--pr-red-soft` | dunkelrote Schrift, zarter roter Hintergrund |
+| `--pr-accent`, `--pr-accent-hover` | Hauptaktionen (Buttons), Auswahl – Schwarz bzw. Weiß |
+| `--pr-accent-text`, `--pr-accent-soft` | Akzentschrift, zarter Akzent-Hintergrund |
+| `--pr-signal`, `--pr-signal-text`, `--pr-signal-soft` | gedämpftes Rot, nur für Fehler und Warnungen |
 | `--pr-ink`, `--pr-ink-soft` | Zweitakzent Schwarz (im Dunkelmodus Weiß): Nummern, Symbole, Info-Hinweise, Zweit-Buttons |
 
-**Faustregel:** Dunkelrot für das, was der Nutzer *tun* soll, Schwarz für das, was er *wissen* soll. Beides sparsam einsetzen – der Großteil der Seite bleibt Schwarz/Weiß.
+**Faustregel:** Der gefüllte Akzent (Schwarz bzw. Weiß) für das, was der Nutzer *tun* soll; Rot nur, wenn etwas schiefgeht. Beides sparsam einsetzen – der Großteil der Seite bleibt Schwarz/Weiß.
 
 ## Bausteine
 

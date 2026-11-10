@@ -38,7 +38,7 @@
       <section class="pr-hero">
         <span class="pr-eyebrow">Design Kit</span>
         <h1 class="pr-title">Ein Stil für <em>alle Projekte</em></h1>
-        <p class="pr-lead">Elegant und zurückhaltend: Weiß bzw. Schwarz als Grund, Dunkelrot für Aktionen, Schwarz als ruhiger Zweitakzent.</p>
+        <p class="pr-lead">Elegant und zurückhaltend: Weiß bzw. Schwarz als Grund, Schwarz bzw. Weiß für Aktionen, Hellgrau als ruhiger Akzent, Rot nur als Fehlersignal.</p>
       </section>
 
       <section class="block" id="logo">
@@ -79,12 +79,12 @@
             <kbd>Strg</kbd>
           </div>
           <div class="grid3">
-            <label class="pr-card pr-card-select"><input type="radio" name="c" hidden checked /><h3>Auswählbare Karte</h3><p>Ausgewählt mit dunkelrotem Rand.</p></label>
+            <label class="pr-card pr-card-select"><input type="radio" name="c" hidden checked /><h3>Auswählbare Karte</h3><p>Ausgewählt mit Akzentrand.</p></label>
             <label class="pr-card pr-card-select"><input type="radio" name="c" hidden /><h3>Zweite Option</h3><p>Klicken zum Auswählen.</p></label>
             <div class="pr-card"><h3>Karte</h3><p>Für Hinweise, Funktionen oder Kennzahlen.</p></div>
           </div>
           <p class="pr-note"><strong>Hinweis:</strong> Dezente Info in Schwarz.</p>
-          <p class="pr-note pr-note-accent"><strong>Wichtig:</strong> Betonter Hinweis in Dunkelrot.</p>
+          <p class="pr-note pr-note-accent"><strong>Wichtig:</strong> Warnhinweis im Signalrot.</p>
           <div class="pr-alert"><strong>Fehler</strong> Etwas ist schiefgelaufen.</div>
           <div class="pr-success"><strong>Fertig</strong> Aktion erfolgreich abgeschlossen.</div>
           <div class="pr-tabs"><button class="pr-tab active">Erster Tab</button><button class="pr-tab">Zweiter Tab</button><button class="pr-tab">Dritter Tab</button></div>
@@ -111,7 +111,7 @@
     <script>
       const tokens = [
         ['Hintergrund', '--pr-bg'], ['Fläche', '--pr-surface-2'], ['Rahmen', '--pr-border'], ['Text', '--pr-text'],
-        ['Text 2', '--pr-text-2'], ['Dunkelrot', '--pr-red'], ['Dunkelrot Text', '--pr-red-text'], ['Dunkelrot zart', '--pr-red-soft'],
+        ['Text 2', '--pr-text-2'], ['Akzent', '--pr-accent'], ['Akzent zart', '--pr-accent-soft'], ['Signal', '--pr-signal'], ['Signal zart', '--pr-signal-soft'],
         ['Schwarz-Akzent', '--pr-ink'], ['Schwarz zart', '--pr-ink-soft'],
       ];
       const render = () => {
