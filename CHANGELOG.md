@@ -4,6 +4,19 @@ Alle nennenswerten Änderungen an diesem Projekt werden hier dokumentiert.
 Das Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1.1.0/),
 die Versionierung folgt [Semantic Versioning](https://semver.org/lang/de/).
 
+## [1.6.0] - 2026-11-18
+
+### Geändert
+
+- **Variablen-Ereignisse passend zum MUX-Framework.** Auf dem Unified Panel laufen zwei Skripte im Aufgabenplaner:
+  FRAMEWORK (`FRAMEWORK_final.js`, MUX-Anbindung) und TagEvent. Das erzeugte TagEvent übernimmt deshalb keine
+  Ereignisse der Variablentabelle `01V_Framework` mehr – sonst würden beide Skripte gleichzeitig den Handshake
+  schreiben. Ein Hinweis nennt die Anzahl.
+- Der Zustand liegt jetzt in `TagEvent.last` (keine globale Definition mehr nötig).
+- Neu: Steht die interne Variable `12V_CCS_TagEvent_Init` auf 0 (Runtime-Start, Neuanmeldung über das Framework),
+  verwirft das TagEvent seinen Zustand, löst alle Ereignisse neu aus und setzt die Variable auf 1 – so wird die
+  Menüleiste neu aufgebaut.
+
 ## [1.5.0] - 2026-11-10
 
 ### Geändert
@@ -110,6 +123,7 @@ Unified Migration Tools, die vollständig im Browser läuft.
 - Responsives Design im hellen und dunklen Modus (PRH Design Kit)
 - Automatisierte Tests für alle Umwandlungsregeln
 
+[1.6.0]: https://github.com/paul-rafael/wincc-unified-list-converter/releases/tag/v1.6.0
 [1.4.1]: https://github.com/paul-rafael/wincc-unified-list-converter/releases/tag/v1.4.1
 [1.4.0]: https://github.com/paul-rafael/wincc-unified-list-converter/releases/tag/v1.4.0
 [1.3.0]: https://github.com/paul-rafael/wincc-unified-list-converter/releases/tag/v1.3.0

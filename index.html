@@ -206,8 +206,8 @@
               <ol class="steps">
                 <li>Die HMI-Variablen des Advanced-Geräts per TIA Openness exportieren (ZIP mit <code>manifest.json</code> und <code>Tags/*.xml</code>).</li>
                 <li>Oben <em>Variablen-Ereignisse</em> wählen, die ZIP hochladen und konvertieren.</li>
-                <li><strong>Skript kopieren</strong> und in ein globales Skriptmodul einfügen. Die Zeile <code>var TagEventLast = {};</code> gehört in die globalen Definitionen des Moduls.</li>
-                <li><code>TagEvent()</code> zyklisch aufrufen, z. B. über eine Aufgabe im Scheduler, und die Hinweise im Ergebnis abarbeiten.</li>
+                <li><strong>Skript kopieren</strong> und als Funktion <code>TagEvent</code> in ein globales Skriptmodul einfügen. Dazu die interne Variable <code>12V_CCS_TagEvent_Init</code> anlegen (Int, Startwert 0, <strong>nicht</strong> persistent).</li>
+                <li>Im Aufgabenplaner die Aufgabe <em>TagEvent</em> (Trigger T250ms) anlegen – neben der Aufgabe <em>Framework</em> für das MUX-Framework – und die Hinweise im Ergebnis abarbeiten.</li>
               </ol>
               <p class="guide-note"><strong>Ohne Openness:</strong> Der Excel-Export der HMI-Variablen enthält keine Ereignisse. Lädst du ihn hoch, entsteht eine Vorlage <code>TagEvents.xlsx</code>, in die du die Ereignisse einträgst; die ausgefüllte Vorlage ergibt ebenfalls das Skript.</p>
             </div>
@@ -216,7 +216,8 @@
               <ul>
                 <li>Eine Funktion pro Ereignis; mehrere Ereignisse und Funktionslisten-Einträge pro Variable werden übernommen.</li>
                 <li><em>Wertänderung</em> läuft nur, wenn sich der Wert ändert; <em>Überschreitung</em> nur beim Überschreiten des Grenzwerts aus der Variable.</li>
-                <li>Nach dem Start werden die Funktionslisten einmal ausgeführt, damit abhängige Variablen stimmen.</li>
+                <li>Nach dem Start werden die Funktionslisten einmal ausgeführt, damit abhängige Variablen stimmen. Dasselbe passiert, wenn <code>12V_CCS_TagEvent_Init</code> auf 0 steht – so baut das MUX-Framework nach einer Neuanmeldung die Menüleiste neu auf.</li>
+                <li>Ereignisse der Tabelle <code>01V_Framework</code> bleiben draußen: Die übernimmt das MUX-Framework-Skript (<code>FRAMEWORK_final.js</code>). Sonst würden beide Skripte gleichzeitig den Handshake schreiben.</li>
                 <li>Umgesetzt: <code>SetTag</code>, <code>LinearScaling</code>, <code>InvertLinearScaling</code>, <code>SetBit</code>, <code>ResetBit</code>, <code>InvertBit</code>, <code>IncreaseValue</code>, <code>DecreaseValue</code>. Andere Funktionen erscheinen als <code>// TODO</code> mit Hinweis.</li>
                 <li><strong>Bildwechsel</strong> (<code>ActivateScreen</code>, <code>ActivateScreenByNumber</code>) sind aus einem zyklischen Skript nicht möglich: Sie kommen nicht ins Skript, sondern werden als Hinweis mit Variable, Ereignis und Bild aufgelistet.</li>
                 <li>Variablennamen werden wie bei <em>HMI-Variablen</em> übersetzt (<code>12V_CCS\HmiSc\AdrNoScan</code> → <code>12V_CCS_HmiSc_AdrNoScan</code>).</li>

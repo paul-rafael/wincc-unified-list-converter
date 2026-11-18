@@ -11,6 +11,11 @@
  * - First call after runtime start: the function lists run once, so derived tags are initialised.
  * Screen changes (ActivateScreen, ActivateScreenByNumber) are not possible from a cyclic background script;
  * they are left out of the script and listed as notices.
+ *
+ * Two scripts run on the Unified panel: FRAMEWORK (MUX connection, FRAMEWORK_final.js) and TagEvent. The events of
+ * the tag table "01V_Framework" belong to FRAMEWORK and are left out here, otherwise both would write the handshake.
+ * The state lives in TagEvent.last; the internal tag 12V_CCS_TagEvent_Init = 0 discards it so that all events run
+ * again (runtime start, re-login via the MUX framework).
  */
 import JSZip from 'jszip';
 import { ConversionError } from '../errors';
@@ -41,6 +46,10 @@ export interface AdvancedTag {
   events: TagEventDef[];
   source: string;
 }
+
+/** Tags handled by the MUX framework script (FRAMEWORK_final.js), not by TagEvent. */
+const FRAMEWORK_RE = /^"?01V_Framework\\/;
+export const INIT_TAG = '12V_CCS_TagEvent_Init';
 
 const EVENT_LABEL: Record<string, string> = {
   ChangeValue: 'Wertänderung',
@@ -293,6 +302,8 @@ export interface ScriptStats {
   screens: number;
   /** Events that consisted of screen changes only and therefore have no function in the script. */
   screenOnly: number;
+  /** Events of the MUX framework tags, left to FRAMEWORK_final.js. */
+  framework: number;
 }
 
 export function buildScriptFromTags(tags: AdvancedTag[], log: NoticeLog, source: string): { script: string; stats: ScriptStats } {
@@ -301,12 +312,18 @@ export function buildScriptFromTags(tags: AdvancedTag[], log: NoticeLog, source:
   const usedNames = new Set<string>();
   const fns: string[][] = [];
   const calls: string[] = [];
-  const stats: ScriptStats = { tags: tags.length, withEvents: 0, handlers: 0, statements: 0, todos: 0, screens: 0, screenOnly: 0 };
+  const stats: ScriptStats = { tags: tags.length, withEvents: 0, handlers: 0, statements: 0, todos: 0, screens: 0, screenOnly: 0, framework: 0 };
+  const frameworkTags: string[] = [];
 
   const sorted = [...tags].sort((a, b) => a.name.localeCompare(b.name, 'de'));
   for (const tag of sorted) {
     const events = tag.events.filter((e) => e.entries.length);
     if (!events.length) continue;
+    if (FRAMEWORK_RE.test(tag.name)) {
+      stats.framework += events.length;
+      frameworkTags.push(tag.name);
+      continue;
+    }
     const self = unifiedName(tag.name);
     let emitted = false;
     for (const ev of events) {
@@ -334,7 +351,7 @@ export function buildScriptFromTags(tags: AdvancedTag[], log: NoticeLog, source:
         }
         stats.screens++;
         log.warn(
-          `Bildwechsel nicht übernommen: „${tag.name}“ (${label}) → ${s.screen}. Aus einem zyklischen Skript ist kein Bildwechsel möglich – bitte in Unified anders lösen.`,
+          `Bildwechsel nicht übernommen: „${tag.name}“ (${label}) → ${s.screen}. Aus einem zyklischen Skript ist kein Bildwechsel möglich – bitte in Unified anders lösen, z. B. über eine Variable, die ein Bildskript auswertet (wie screenbit im MUX-Framework).`,
           ctx.where,
         );
       }
@@ -366,26 +383,34 @@ export function buildScriptFromTags(tags: AdvancedTag[], log: NoticeLog, source:
     if (emitted) stats.withEvents++;
   }
 
+  if (stats.framework) {
+    log.info(
+      `${stats.framework} Ereignisse an ${frameworkTags.length} Variablen der Tabelle „01V_Framework“ sind nicht im TagEvent – sie übernimmt das MUX-Framework-Skript (FRAMEWORK_final.js). Beide Skripte würden sonst gleichzeitig den Handshake schreiben.`,
+    );
+  }
   const out: string[] = [
     `// ${SCRIPT_NAME} – erzeugt mit dem WinCC Unified List Converter aus „${source}“`,
     `// Ersatz für die Variablen-Ereignisse aus WinCC Advanced: ${stats.withEvents} Variablen, ${stats.handlers} Ereignisse.`,
-    '// TagEvent() zyklisch aufrufen, z. B. über eine Aufgabe im Scheduler.',
-    '',
-    '// Globale Definition – in WinCC Unified in den Bereich „Globale Definitionen“ des Skriptmoduls übernehmen.',
-    '// Merkt sich die letzten Werte, damit jedes Ereignis nur beim Eintreten ausgeführt wird.',
-    'var TagEventLast = {};',
-    '',
-    'export function TagEvent(parameter1, parameter2) {',
+    '// Im Aufgabenplaner zyklisch aufrufen (Aufgabe „TagEvent“, T250ms), neben der Aufgabe „Framework“ (FRAMEWORK_final.js).',
+    `// Benötigt die interne Variable ${INIT_TAG} (Int, Startwert 0, NICHT persistent).`,
   ];
-  if (stats.screens) {
-    out.splice(3, 0, `// Bildwechsel aus Advanced (${stats.screens}) sind nicht enthalten – sie sind im Converter als Hinweise aufgelistet.`);
-  }
+  if (stats.framework) out.push(`// Ereignisse der Tabelle 01V_Framework (${stats.framework}) übernimmt das MUX-Framework-Skript – sie sind hier nicht enthalten.`);
+  if (stats.screens) out.push(`// Bildwechsel aus Advanced (${stats.screens}) sind nicht enthalten – sie sind im Converter als Hinweise aufgelistet.`);
+  out.push('', 'export function TagEvent(parameter1, parameter2) {');
+  out.push(`${INDENT}// Letzte Werte – bleiben zwischen den Aufrufen erhalten, damit jedes Ereignis nur beim Eintreten läuft.`);
+  out.push(`${INDENT}if (!TagEvent.last) TagEvent.last = {};`);
+  out.push(`${INDENT}// ${INIT_TAG} = 0 (Runtime-Start, Neuanmeldung über das MUX-Framework): alle Ereignisse neu auslösen.`);
+  out.push(`${INDENT}if (${get(INIT_TAG)} == 0) {`);
+  out.push(`${INDENT}${INDENT}TagEvent.last = {};`);
+  out.push(`${INDENT}${INDENT}HMIRuntime.Tags.SysFct.SetTagValue(${js(INIT_TAG)}, 1);`);
+  out.push(`${INDENT}}`);
+  out.push('');
   out.push(...calls, '');
-  out.push(`${INDENT}// 0 = nichts zu tun, 1 = erster Aufruf nach dem Start, 2 = Ereignis eingetreten`);
+  out.push(`${INDENT}// 0 = nichts zu tun, 1 = erster Aufruf (nach Start bzw. Init), 2 = Ereignis eingetreten`);
   out.push(`${INDENT}function TagEventCheck(key, state) {`);
-  out.push(`${INDENT}${INDENT}var first = !(key in TagEventLast);`);
-  out.push(`${INDENT}${INDENT}var changed = !first && TagEventLast[key] !== state;`);
-  out.push(`${INDENT}${INDENT}TagEventLast[key] = state;`);
+  out.push(`${INDENT}${INDENT}var first = !(key in TagEvent.last);`);
+  out.push(`${INDENT}${INDENT}var changed = !first && TagEvent.last[key] !== state;`);
+  out.push(`${INDENT}${INDENT}TagEvent.last[key] = state;`);
   out.push(`${INDENT}${INDENT}return first ? 1 : changed ? 2 : 0;`);
   out.push(`${INDENT}}`);
   for (const f of fns) out.push('', ...f);
@@ -399,7 +424,9 @@ export async function convertAdvancedEvents(input: ArrayBuffer | Uint8Array, fil
   const { script, stats } = buildScriptFromTags(tags, log, fileName);
   if (!stats.handlers) {
     throw new ConversionError(
-      stats.screens
+      stats.framework && !stats.screens
+        ? `Die Ereignisse in den ${tags.length} Variablen gehören alle zum MUX-Framework (01V_Framework) – die übernimmt FRAMEWORK_final.js, ein TagEvent ist nicht nötig.`
+        : stats.screens
         ? `Die Ereignisse in den ${tags.length} Variablen bestehen nur aus Bildwechseln. Die sind aus einem zyklischen Skript nicht möglich – es gibt kein Skript.`
         : `In den ${tags.length} Variablen ist kein Ereignis mit Funktionsliste hinterlegt – es gibt nichts umzusetzen.`,
     );
@@ -412,6 +439,7 @@ export async function convertAdvancedEvents(input: ArrayBuffer | Uint8Array, fil
     summary:
       `Skript erstellt: ${stats.handlers} Ereignisse an ${stats.withEvents} von ${stats.tags} Variablen, ${stats.statements} Anweisungen` +
       (stats.todos ? `, davon ${stats.todos} zum manuellen Nacharbeiten` : '') +
+      (stats.framework ? `. ${stats.framework} Framework-Ereignisse bleiben beim MUX-Framework-Skript` : '') +
       (stats.screens ? `. ${stats.screens} Bildwechsel nicht übernommen (siehe Hinweise).` : '.'),
   };
 }

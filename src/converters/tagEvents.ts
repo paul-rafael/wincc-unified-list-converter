@@ -243,7 +243,7 @@ interface FnBuild {
   triggers: Map<string, Set<EventKind>>;
   blocks: { cond: string; lines: string[] }[];
   comments: string[];
-  /** Triggers whose value change starts a screen change or script (edge detected via TagEventLast). */
+  /** Triggers whose value change starts a screen change or script (edge detected via TagEvent.last). */
   changeTriggers: Set<string>;
 }
 
@@ -339,21 +339,20 @@ export function buildEventScript(rows: EventRow[], knownTags: Set<string> | null
   out.push(`// ${SCRIPT_NAME} – erzeugt mit dem WinCC Unified List Converter aus „${source}“`);
   out.push('// Ersatz für WinCC-Advanced-Variablenereignisse. TagEvent() zyklisch aufrufen.');
   out.push('// Wertänderung: Aktion läuft bei jedem Aufruf. Über-/Unterschreitung: bei jedem Aufruf, solange der Grenzwert über- bzw. unterschritten ist.');
+  out.push('');
+  out.push('export function TagEvent(parameter1, parameter2) {');
   if (edgeDetection) {
-    out.push('');
-    out.push('// Globale Definition – in WinCC Unified in den Bereich „Globale Definitionen“ des Skriptmoduls übernehmen.');
-    out.push('// Merkt sich die letzten Werte, damit Skripte nur beim Ereignis selbst laufen.');
-    out.push('var TagEventLast = {};');
+    out.push(`${INDENT}// Letzte Werte – bleiben zwischen den Aufrufen erhalten, damit Skripte nur beim Ereignis selbst laufen.`);
+    out.push(`${INDENT}if (!TagEvent.last) TagEvent.last = {};`);
     out.push('');
   }
-  out.push('export function TagEvent(parameter1, parameter2) {');
   for (const f of used) out.push(`${INDENT}${f.name}();`);
   if (edgeDetection) {
     out.push('');
     out.push(`${INDENT}// true, wenn sich der Wert seit dem letzten Aufruf geändert hat (beim ersten Aufruf: false)`);
     out.push(`${INDENT}function TagEventChanged(key, value) {`);
-    out.push(`${INDENT}${INDENT}var changed = key in TagEventLast && TagEventLast[key] !== value;`);
-    out.push(`${INDENT}${INDENT}TagEventLast[key] = value;`);
+    out.push(`${INDENT}${INDENT}var changed = key in TagEvent.last && TagEvent.last[key] !== value;`);
+    out.push(`${INDENT}${INDENT}TagEvent.last[key] = value;`);
     out.push(`${INDENT}${INDENT}return changed;`);
     out.push(`${INDENT}}`);
   }
@@ -381,9 +380,6 @@ export function buildEventScript(rows: EventRow[], knownTags: Set<string> | null
   }
   out.push('}');
   out.push('');
-  if (edgeDetection) {
-    log.info('Skripte laufen nur, wenn das Ereignis eintritt. Dafür steht oben im Skript die Zeile „var TagEventLast = {};“ – sie gehört in die globalen Definitionen des Skriptmoduls.');
-  }
   return { script: out.join('\n'), functions: used.length, actions };
 }
 

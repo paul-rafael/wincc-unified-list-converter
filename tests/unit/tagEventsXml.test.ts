@@ -112,6 +112,33 @@ describe('Variablen-Ereignisse aus dem Openness-Export', () => {
     expect(res.notices.some((n) => /Line\\Sc\\AdrA/.test(n.text))).toBe(true);
   });
 
+  it('leaves the MUX framework events to FRAMEWORK_final.js', async () => {
+    const fw = tagXml('01V_Framework\\_HL._LOCK_STATE', [event('AboveUpperLimit', entry('SetTag', ['Tag', { tag: '01V_Framework\\_i_MUX' }], ['Value', { tag: '"01V_Framework\\_HL._MUX_DB"' }]))], '<LimitUpper2>1</LimitUpper2>');
+    const res = await convertTagEvents(await exportZip({ fw, adr: files.adr, adrA: files.adrA, adrB: files.adrB }), 'Export.zip');
+    expect(res.text).not.toMatch(/"01V_Framework/); // no statement touches a framework tag
+    expect(res.text).toContain('Line_Sc_AdrA');
+    expect(res.summary).toMatch(/1 Framework-Ereignisse bleiben beim MUX-Framework-Skript/);
+    expect(res.notices.some((n) => /FRAMEWORK_final\.js/.test(n.text))).toBe(true);
+    await expect(convertTagEvents(await exportZip({ fw }), 'E.zip')).rejects.toThrow(/gehören alle zum MUX-Framework/);
+  });
+
+  it('keeps its state in TagEvent.last and starts over when 12V_CCS_TagEvent_Init is 0', async () => {
+    const res = await convertTagEvents(await exportZip(files), 'Export.zip');
+    expect(res.text).not.toContain('TagEventLast');
+    const s = sim(res.text!);
+    s.tags.Line_Sc_DbAdr = 100;
+    s.tags['12V_CCS_TagEvent_Init'] = 0;
+    s.run();
+    expect(s.tags['12V_CCS_TagEvent_Init']).toBe(1);
+    expect(s.tags.Line_Sc_AdrA).toBe(112);
+    s.tags.Line_Sc_AdrA = 0;
+    s.run();
+    expect(s.tags.Line_Sc_AdrA).toBe(0); // no change, no event
+    s.tags['12V_CCS_TagEvent_Init'] = 0; // e.g. the framework after a re-login
+    s.run();
+    expect(s.tags.Line_Sc_AdrA).toBe(112); // all function lists ran again
+  });
+
   it('accepts a single tag XML and stops when nothing has an event', async () => {
     const one = await convertTagEvents(new TextEncoder().encode(files.lacs), 'lacs.xml');
     expect(one.summary).toMatch(/1 Ereignisse an 1 von 1/);
